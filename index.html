@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE NETWORK - Final Pro</title>
+    <title>ELITE NETWORK - Final Masterpiece</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -12,129 +12,170 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --gold: #ffcc00; --bg: #000; --card: #111; --elite-grad: linear-gradient(135deg, #ffcc00, #ff9900); }
-        body { 
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); 
-            color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; user-select: none; 
-        }
+        :root { --gold: #ffcc00; --bg: #0a0a0a; --card-bg: #151515; --elite-grad: linear-gradient(135deg, #ffcc00, #ffb300); }
         
-        /* Stats Header */
-        .header-stats { background: rgba(20,20,20,0.8); padding: 10px; text-align: center; border-bottom: 1px solid #222; font-size: 11px; }
+        body { 
+            background-color: var(--bg); color: #fff; font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0; padding: 0; overflow: hidden; user-select: none;
+        }
+
+        /* Top Header Stats */
+        .top-stats { 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); 
+            padding: 12px; text-align: center; border-bottom: 1px solid #222; 
+            font-size: 11px; font-weight: bold; color: var(--gold);
+        }
 
         .page { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 120px; }
-        .active-page { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active-page { display: block; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Balance & Coin */
-        .balance-box { text-align: center; margin-top: 10px; }
-        .balance-box h1 { font-size: 48px; margin: 0; background: var(--elite-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
-        
-        .coin-container { display: flex; justify-content: center; margin: 25px 0; }
-        #coin { width: 200px; height: 200px; background: url('https://i.ibb.co/L6M7y9P/gold-coin.png') center/cover; border-radius: 50%; border: 6px solid #1a1a1a; box-shadow: 0 0 40px rgba(255, 204, 0, 0.2); }
-        #coin:active { transform: scale(0.92); }
+        /* Balance Styling */
+        .balance-container { text-align: center; margin-top: 15px; }
+        .balance-container h1 { font-size: 50px; margin: 0; font-weight: 900; background: var(--elite-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .token-info { font-size: 10px; letter-spacing: 3px; color: #888; text-transform: uppercase; }
 
-        /* Action Buttons (Spin & Turbo) */
-        .action-row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-        .btn-action { background: #1a1a1a; border: 1px solid var(--gold); color: var(--gold); padding: 12px 20px; border-radius: 12px; font-weight: bold; flex: 1; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-action i { font-size: 16px; }
+        /* The BIG Coin */
+        .coin-wrap { display: flex; justify-content: center; margin: 40px 0; }
+        .main-coin {
+            width: 240px; height: 240px; border-radius: 50%;
+            background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
+            border: 10px solid #1a1a1a; position: relative;
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2), inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.05s;
+        }
+        .main-coin:active { transform: scale(0.92); }
+        .main-coin span { font-size: 45px; font-weight: 900; color: #000; letter-spacing: 2px; text-shadow: 1px 1px 0px rgba(255,255,255,0.3); }
 
-        /* Nav Menu (4 Items) */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #080808; display: flex; border-top: 1px solid #222; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; padding-top: 12px; color: #555; font-size: 10px; font-weight: bold; }
-        .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        /* Action Buttons */
+        .mine-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .action-card { 
+            background: var(--card-bg); border: 1px solid #222; border-radius: 16px; 
+            padding: 15px; text-align: center; transition: 0.2s;
+        }
+        .action-card:active { border-color: var(--gold); }
+        .action-card i { font-size: 24px; color: var(--gold); margin-bottom: 8px; display: block; }
+        .action-card span { font-size: 13px; font-weight: bold; }
 
-        /* Lists & Cards */
-        .card { background: #111; border: 1px solid #222; border-radius: 15px; padding: 15px; margin-bottom: 12px; }
-        .asset-val { font-size: 24px; color: var(--gold); font-weight: 900; }
-        
-        /* Spin Wheel Modal */
-        #spin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; text-align: center; padding-top: 50px; }
-        .wheel-img { width: 250px; height: 250px; border: 5px solid var(--gold); border-radius: 50%; transition: 4s cubic-bezier(0.1, 0, 0.1, 1); margin-bottom: 20px; }
+        /* Bottom Navigation */
+        .navbar { 
+            position: fixed; bottom: 0; width: 100%; height: 80px; 
+            background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000;
+        }
+        .nav-link { flex: 1; text-align: center; padding-top: 15px; color: #555; transition: 0.2s; }
+        .nav-link.active { color: var(--gold); }
+        .nav-link i { font-size: 22px; display: block; margin-bottom: 5px; }
+        .nav-link span { font-size: 10px; font-weight: bold; }
+
+        /* Energy Bar */
+        .energy-section { background: #111; padding: 12px; border-radius: 12px; margin-top: 25px; border: 1px solid #1a1a1a; }
+        .bar-bg { height: 8px; background: #222; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--elite-grad); width: 100%; transition: 0.3s; }
+
+        /* Spin Popup */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 9999; }
+        .modal-content { text-align: center; padding-top: 60px; }
+        .wheel-box { width: 280px; height: 280px; border: 8px solid var(--gold); border-radius: 50%; margin: 20px auto; position: relative; transition: 4s cubic-bezier(0.1, 0, 0.1, 1); background: #111; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; }
+
+        /* Float Anim */
+        .float-text { position: absolute; font-weight: 900; font-size: 30px; color: #fff; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-120px); } }
+
+        .btn-gold { background: var(--elite-grad); color: #000; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; width: 100%; }
+        input { width: 100%; padding: 14px; background: #111; border: 1px solid #222; color: #fff; border-radius: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="header-stats">COMMUNITY MINED: <span id="global-mined" style="color:var(--gold)">0.00M</span> TTE</div>
+    <div class="top-stats">GLOBAL MINED: <span id="global-val">0.00M</span> TTE</div>
 
     <div id="mine" class="page active-page">
-        <div class="balance-box">
+        <div class="balance-container">
+            <div class="token-info">Your TTE Balance</div>
             <h1 id="balance">0</h1>
-            <div style="font-size:11px; letter-spacing:2px; color:#888;">TTE TOKENS</div>
         </div>
 
-        <div class="coin-container">
-            <div id="coin" onclick="handleTap(event)"></div>
+        <div class="coin-wrap">
+            <div class="main-coin" id="tap-coin" onclick="handleTap(event)">
+                <span>ELITE</span>
+            </div>
         </div>
 
-        <div class="action-row">
-            <div class="btn-action" onclick="openSpin()"><i class="fas fa-sync-alt"></i> Lucky Spin</div>
-            <div class="btn-action" onclick="activateTurbo()"><i class="fas fa-bolt"></i> Turbo 5X</div>
+        <div class="mine-actions">
+            <div class="action-card" onclick="openSpin()">
+                <i class="fas fa-dharmachakra"></i>
+                <span>Lucky Spin</span>
+            </div>
+            <div class="action-card" onclick="startTurbo()">
+                <i class="fas fa-bolt"></i>
+                <span>Turbo 5X</span>
+            </div>
         </div>
 
-        <div class="card" style="margin-top:20px;">
+        <div class="energy-section">
             <div style="display:flex; justify-content:space-between; font-size:12px;">
-                <span>⚡ Energy: <span id="energy-val">1000</span>/1000</span>
-                <span id="turbo-timer" style="color:var(--gold)">Normal Mode</span>
+                <span>⚡ Energy: <span id="en-val">1000</span></span>
+                <span id="mode-text" style="color:var(--gold)">Normal</span>
             </div>
-            <div style="height:6px; background:#222; border-radius:10px; margin-top:8px; overflow:hidden;">
-                <div id="energy-bar" style="height:100%; background:var(--gold); width:100%;"></div>
-            </div>
+            <div class="bar-bg"><div class="bar-fill" id="en-bar"></div></div>
         </div>
     </div>
 
     <div id="tasks" class="page">
-        <h2 style="color:var(--gold)">Missions</h2>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b>Daily Video Ad</b><br><small style="color:var(--gold)">+2,000 TTE</small></div>
-                <button onclick="showAdTask()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:8px; font-weight:bold;">Watch</button>
-            </div>
+        <h2 style="color:var(--gold)">Daily Tasks</h2>
+        <div class="action-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="text-align:left;"><b>Video Advertisement</b><br><small style="color:var(--gold)">+2,000 TTE & 1 Spin</small></div>
+            <button class="btn-gold" style="width:auto;" onclick="watchAd()">Watch</button>
         </div>
-        <div id="admin-tasks"></div> </div>
+        <div id="admin-task-list"></div>
+    </div>
 
     <div id="refer" class="page">
         <h2 style="color:var(--gold)">Invite Friends</h2>
-        <div class="card">
-            <p style="font-size:12px;">Get <b>20,000 TTE</b> per invite + <b>10% Commission</b>!</p>
-            <input type="text" id="ref-link" readonly style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:10px; border-radius:8px;">
-            <button onclick="copyRef()" class="btn-action" style="width:100%; margin-top:10px;">Copy Link</button>
+        <div class="action-card">
+            <p style="font-size:13px;">Get <b>20,000 TTE</b> per friend + 10% commission.</p>
+            <input type="text" id="ref-url" readonly>
+            <button class="btn-gold" style="margin-top:10px;" onclick="copyLink()">Copy Link</button>
         </div>
-        <h4>Leaderboard</h4>
+        <h3 style="margin-top:20px;">Top Referrals</h3>
         <div id="leaderboard"></div>
     </div>
 
     <div id="airdrop" class="page">
-        <h2 style="color:var(--gold)">Airdrop Asset</h2>
-        <div class="card" style="border-top: 3px solid var(--gold);">
-            <div style="font-size:12px; color:#888;">Elite Asset Balance</div>
-            <div class="asset-val" id="elite-asset">0.00 ELITE</div>
+        <h2 style="color:var(--gold)">Airdrop & Assets</h2>
+        <div class="action-card" style="border-left: 4px solid var(--gold); text-align:left;">
+            <div style="color:#888; font-size:12px;">Premium Asset Balance</div>
+            <div style="font-size:28px; font-weight:900; color:var(--gold);"><span id="elite-asset">0.00</span> ELITE</div>
         </div>
-        <div class="card">
-            <p style="font-size:12px;">Register your TON Wallet for 2026 Distribution.</p>
-            <input type="text" id="wallet-addr" placeholder="Enter TON Address (UQ...)" style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:12px; border-radius:8px;">
-            <button onclick="saveWallet()" class="btn-action" style="width:100%; margin-top:10px; background:var(--gold); color:#000;">SAVE WALLET</button>
+        
+        <div class="action-card" style="margin-top:20px;">
+            <p style="font-size:13px;">Enter TON Wallet (UQ...) for listing distribution.</p>
+            <input type="text" id="ton-addr" placeholder="Wallet Address">
+            <button class="btn-gold" style="margin-top:15px;" onclick="saveTon()">SAVE WALLET</button>
         </div>
     </div>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="nav('mine', this)"><i class="fas fa-hammer"></i>Mine</div>
-        <div class="nav-item" onclick="nav('tasks', this)"><i class="fas fa-tasks"></i>Tasks</div>
-        <div class="nav-item" onclick="nav('refer', this)"><i class="fas fa-users"></i>Refer</div>
-        <div class="nav-item" onclick="nav('airdrop', this)"><i class="fas fa-parachute-box"></i>Airdrop</div>
-    </nav>
+    <div class="navbar">
+        <div class="nav-link active" onclick="nav('mine', this)"><i class="fas fa-hammer"></i><span>MINE</span></div>
+        <div class="nav-link" onclick="nav('tasks', this)"><i class="fas fa-tasks"></i><span>TASKS</span></div>
+        <div class="nav-link" onclick="nav('refer', this)"><i class="fas fa-users"></i><span>FRIENDS</span></div>
+        <div class="nav-link" onclick="nav('airdrop', this)"><i class="fas fa-wallet"></i><span>AIRDROP</span></div>
+    </div>
 
-    <div id="spin-modal">
-        <h2 style="color:var(--gold)">Lucky Spin</h2>
-        <div id="wheel-container">
-            <img src="https://i.ibb.co/L6M7y9P/gold-coin.png" id="wheel" class="wheel-img">
+    <div id="spin-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--gold); margin-bottom:0;">LUCKY SPIN</h2>
+            <p style="font-size:12px;">Win $ELITE Assets</p>
+            <div id="spin-wheel" class="wheel-box">?</div>
+            <p>Spins Left: <span id="spin-num">0</span></p>
+            <button class="btn-gold" style="width:200px;" onclick="spin()">SPIN NOW</button>
+            <button onclick="closeSpin()" style="background:none; border:none; color:#888; margin-top:30px; display:block; width:100%;">BACK TO MINE</button>
         </div>
-        <p>Available Spins: <span id="spin-count">0</span></p>
-        <button onclick="spinNow()" id="spin-btn" class="btn-action" style="width:200px; margin:auto;">SPIN NOW</button>
-        <button onclick="closeSpin()" style="background:none; border:none; color:#555; margin-top:20px; display:block; width:100%;">Close</button>
     </div>
 
     <script>
+        // --- Firebase Config (Do not change) ---
         const firebaseConfig = {
             apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
             authDomain: "tte-game.firebaseapp.com",
@@ -149,123 +190,110 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "user_test";
-        let balance = 0, eliteAsset = 0, energy = 1000, spins = 0, totalSpins = 0;
-        let tapPower = 1;
+        const uid = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "test_88";
+        let bal = 0, asset = 0, en = 1000, sp = 0, totSp = 0, power = 1;
 
         // Million Formatting
-        function nForm(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-            return Math.floor(num).toLocaleString();
+        function format(n) {
+            return n >= 1000000 ? (n/1000000).toFixed(2) + 'M' : Math.floor(n).toLocaleString();
         }
 
-        // Data Sync
-        db.ref('users/' + userId).on('value', (snap) => {
-            const d = snap.val();
+        // Sync User Data
+        db.ref('users/' + uid).on('value', s => {
+            const d = s.val();
             if(d) {
-                balance = d.balance || 0;
-                eliteAsset = d.eliteAsset || 0;
-                spins = d.spins || 0;
-                totalSpins = d.totalSpins || 0;
-                document.getElementById('balance').innerText = nForm(balance);
-                document.getElementById('elite-asset').innerText = eliteAsset.toFixed(2) + " ELITE";
-                document.getElementById('spin-count').innerText = spins;
-                document.getElementById('ref-link').value = "https://t.me/taptoearn_tte_bot?start=" + userId;
-                if(d.wallet) document.getElementById('wallet-addr').value = d.wallet;
+                bal = d.balance || 0;
+                asset = d.eliteAsset || 0;
+                sp = d.spins || 0;
+                totSp = d.totalSpins || 0;
+                document.getElementById('balance').innerText = format(bal);
+                document.getElementById('elite-asset').innerText = asset.toFixed(2);
+                document.getElementById('spin-num').innerText = sp;
+                document.getElementById('ref-url').value = "https://t.me/taptoearn_tte_bot?start=" + uid;
+                if(d.wallet) document.getElementById('ton-addr').value = d.wallet;
             } else {
-                db.ref('users/' + userId).set({ balance: 0, eliteAsset: 0, spins: 1, name: tg.initDataUnsafe.user?.first_name || "Miner" });
+                db.ref('users/' + uid).set({ balance: 0, eliteAsset: 0, spins: 1 });
             }
         });
 
-        // Global Mined Stat
-        db.ref('global_mined').on('value', s => {
-            document.getElementById('global-mined').innerText = nForm(s.val() || 0);
+        // Sync Global Stats
+        db.ref('global_m').on('value', s => {
+            document.getElementById('global-val').innerText = format(s.val() || 0);
         });
 
         function handleTap(e) {
-            if(energy >= tapPower) {
-                balance += tapPower; energy -= tapPower;
+            if(en >= power) {
+                bal += power; en -= power;
                 updateUI();
-                db.ref('users/' + userId).update({ balance: balance });
-                db.ref('global_mined').set(firebase.database.ServerValue.increment(tapPower));
+                db.ref('users/' + uid).update({ balance: bal });
+                db.ref('global_m').set(firebase.database.ServerValue.increment(power));
                 tg.HapticFeedback.impactOccurred('medium');
-                showAnim(e);
+                showText(e);
             }
         }
 
-        function activateTurbo() {
-            const AdController = window.Adsgram.init({ blockId: "21556" });
-            AdController.show().then(() => {
-                tapPower = 5;
-                document.getElementById('turbo-timer').innerText = "TURBO 5X ACTIVE";
-                setTimeout(() => { tapPower = 1; document.getElementById('turbo-timer').innerText = "Normal Mode"; }, 60000);
+        function startTurbo() {
+            const Ad = window.Adsgram.init({ blockId: "21556" });
+            Ad.show().then(() => {
+                power = 5; document.getElementById('mode-text').innerText = "TURBO 5X";
+                setTimeout(() => { power = 1; document.getElementById('mode-text').innerText = "Normal"; }, 60000);
             });
         }
 
-        function openSpin() { document.getElementById('spin-modal').style.display = 'block'; }
-        function closeSpin() { document.getElementById('spin-modal').style.display = 'none'; }
+        function openSpin() { document.getElementById('spin-modal').style.display='block'; }
+        function closeSpin() { document.getElementById('spin-modal').style.display='none'; }
 
-        function spinNow() {
-            if(spins > 0) {
-                const wheel = document.getElementById('wheel');
-                const randDeg = Math.floor(Math.random() * 3600) + 360;
-                wheel.style.transform = `rotate(${randDeg}deg)`;
-                spins--;
-                totalSpins++;
-                
+        function spin() {
+            if(sp > 0) {
+                const w = document.getElementById('spin-wheel');
+                w.style.transform = `rotate(${Math.floor(Math.random()*3000)+360}deg)`;
+                sp--; totSp++;
                 setTimeout(() => {
-                    let win = (Math.random() * 0.1).toFixed(2);
-                    // Secret Logic: 20 spins = 1 Elite
-                    if(totalSpins % 20 === 0) win = 1.00;
-                    
-                    eliteAsset = parseFloat(eliteAsset) + parseFloat(win);
-                    db.ref('users/' + userId).update({ spins: spins, eliteAsset: eliteAsset, totalSpins: totalSpins });
-                    tg.showAlert("You won " + win + " ELITE Tokens!");
+                    let prize = (Math.random()*0.1).toFixed(2);
+                    if(totSp % 20 === 0) prize = 1.00; // Secret 20-spin logic
+                    asset = parseFloat(asset) + parseFloat(prize);
+                    db.ref('users/' + uid).update({ spins: sp, eliteAsset: asset, totalSpins: totSp });
+                    tg.showAlert("Winner! You got " + prize + " $ELITE");
                 }, 4000);
-            } else {
-                tg.showAlert("No spins! Watch an Ad or Refer friends.");
-            }
+            } else { tg.showAlert("No spins left! Watch ads to get more."); }
         }
 
-        function showAdTask() {
-            const AdController = window.Adsgram.init({ blockId: "21556" });
-            AdController.show().then(() => {
-                balance += 2000; spins += 1;
-                db.ref('users/' + userId).update({ balance: balance, spins: spins });
-                tg.showAlert("+2,000 TTE & 1 Spin Added!");
+        function watchAd() {
+            const Ad = window.Adsgram.init({ blockId: "21556" });
+            Ad.show().then(() => {
+                bal += 2000; sp += 1;
+                db.ref('users/' + uid).update({ balance: bal, spins: sp });
+                tg.showAlert("Reward: +2,000 TTE & +1 Spin!");
             });
         }
 
         function updateUI() {
-            document.getElementById('energy-val').innerText = energy;
-            document.getElementById('energy-bar').style.width = (energy/10) + "%";
+            document.getElementById('en-val').innerText = en;
+            document.getElementById('en-bar').style.width = (en/10) + "%";
         }
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
 
-        function saveWallet() {
-            const addr = document.getElementById('wallet-addr').value;
-            db.ref('users/' + userId).update({ wallet: addr });
-            tg.showAlert("Wallet Saved!");
-        }
-
-        function showAnim(e) {
+        function showText(e) {
             const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
             const y = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
             const t = document.createElement('div');
-            t.style.position = 'absolute'; t.style.left = x+'px'; t.style.top = y+'px';
-            t.style.color = 'var(--gold)'; t.style.fontWeight = 'bold'; t.innerText = '+'+tapPower;
-            t.style.animation = 'floatUp 0.6s forwards';
-            document.body.appendChild(t);
+            t.className = 'float-text'; t.style.left = x+'px'; t.style.top = y+'px';
+            t.innerText = '+' + power; document.body.appendChild(t);
             setTimeout(() => t.remove(), 600);
         }
 
-        setInterval(() => { if(energy < 1000) energy += 2; updateUI(); }, 1000);
+        function saveTon() {
+            db.ref('users/' + uid).update({ wallet: document.getElementById('ton-addr').value });
+            tg.showAlert("Wallet Address Saved!");
+        }
+
+        setInterval(() => { if(en < 1000) en += 3; updateUI(); }, 1500);
     </script>
 </body>
 </html>
