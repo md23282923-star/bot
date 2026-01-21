@@ -7,27 +7,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root { --primary-gold: #ffcc00; --bg-color: #0b0c10; --card-bg: #1f2833; --text-color: #ffffff; }
         body { background: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; user-select: none; }
         
-        /* HEADER */
         .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .badge { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--primary-gold); cursor: pointer; }
 
-        /* ADMIN PANEL UI (FIXED) */
         #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; padding: 25px; box-sizing: border-box; overflow-y: auto; }
         .admin-box { background: #111; border: 1px solid var(--primary-gold); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
         .admin-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; box-sizing: border-box; }
         
-        /* PAGES */
         .page { display: none; height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 150px; }
         .active-page { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* COIN & BALANCE */
         .balance-container { text-align: center; margin: 30px 0; }
         .balance-container h1 { font-size: 55px; margin: 0; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
         
@@ -39,7 +36,6 @@
         .store-card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); }
         .btn-gold { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary-gold); color: black; cursor: pointer; margin-top: 10px; font-size: 14px; }
 
-        /* NAV */
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #111; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
         .nav-item { color: #555; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--primary-gold); }
@@ -81,7 +77,7 @@
             <div style="color:var(--primary-gold); font-weight:bold; font-size:14px; letter-spacing:2px;">TTE TOKENS</div>
         </div>
         <div class="tap-zone">
-            <div id="main-coin"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
+            <div id="main-coin" onclick="handleTouch(event)"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
         </div>
         <div style="margin-top: 30px; padding: 0 10px;">
             <div style="font-size:14px; margin-bottom:8px; display:flex; justify-content:space-between;">
@@ -110,6 +106,11 @@
 
     <div id="earn" class="page">
         <h2 style="color: var(--primary-gold);">Missions</h2>
+        <div class="store-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <div><h3 style="margin:0;">Watch & Earn</h3><p style="margin:5px 0 0 0; color:#ffcc00;">+5,000 TTE</p></div>
+            <button class="btn-gold" style="width:80px; margin-top:0;" onclick="showAd()">Watch</button>
+        </div>
+
         <div class="store-card" style="display:flex; justify-content:space-between; align-items:center;">
             <div><h3 id="display-task-name" style="margin:0;">Join Channel</h3><p id="display-task-reward" style="margin:5px 0 0 0; color:#aaa;">+10,000 TTE</p></div>
             <button class="btn-gold" style="width:80px; margin-top:0;" onclick="doTask()">Go</button>
@@ -124,7 +125,6 @@
     </div>
 
     <script>
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
             authDomain: "tte-game.firebaseapp.com",
@@ -142,9 +142,12 @@
         const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest_user";
         const firstName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Player";
 
+        // --- ADSGRAM CONFIG ---
+        // আপনার প্রাপ্ত Unit ID: 21556 ব্যবহার করা হয়েছে
+        const AdController = window.Adsgram.init({ blockId: "21556" });
+
         let balance = 0, energy = 1000, adminClicks = 0, currentTask = { name: "Join Channel", link: "https://t.me/airdrop_the", reward: 10000 };
 
-        // SYNC TASK FROM ADMIN
         db.ref('adminSettings/task').on('value', snap => {
             if(snap.exists()) {
                 currentTask = snap.val();
@@ -153,7 +156,6 @@
             }
         });
 
-        // USER INITIALIZATION & REFERRAL
         db.ref('users/' + userId).once('value', snap => {
             if(!snap.exists()) {
                 let refBy = tg.initDataUnsafe.start_param;
@@ -170,7 +172,6 @@
             }
         });
 
-        // SYNC USER DATA
         db.ref('users/' + userId).on('value', snap => {
             if(snap.exists()) {
                 balance = snap.val().balance || 0;
@@ -179,7 +180,6 @@
             }
         });
 
-        // NAVIGATION
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
@@ -188,16 +188,20 @@
             if(id === 'leaderboard') loadLeaderboard();
         }
 
-        // TAPPING
-        document.getElementById('main-coin').addEventListener('touchstart', e => {
-            e.preventDefault();
+        // Tapping logic compatible with both touch and click
+        function handleTouch(e) {
             if(energy >= 1) {
                 balance++; energy--;
                 db.ref('users/' + userId).update({ balance: balance });
-                showPop(e.touches[0].pageX, e.touches[0].pageY);
+                
+                let x = e.type === 'touchstart' ? e.touches[0].pageX : e.pageX;
+                let y = e.type === 'touchstart' ? e.touches[0].pageY : e.pageY;
+                
+                showPop(x, y);
                 updateUI();
             }
-        });
+        }
+        document.getElementById('main-coin').addEventListener('touchstart', handleTouch);
 
         function showPop(x, y) {
             const el = document.createElement('div'); el.className = 'pop-up';
@@ -205,7 +209,18 @@
             document.body.appendChild(el); setTimeout(() => el.remove(), 700);
         }
 
-        // ADMIN FUNCTIONS (FIXED)
+        // --- ADSGRAM SHOW FUNCTION ---
+        function showAd() {
+            AdController.show().then((result) => {
+                // বিজ্ঞাপন সফলভাবে দেখলে ৫০০০ পয়েন্ট যোগ হবে
+                balance += 5000;
+                db.ref('users/' + userId).update({ balance: balance });
+                tg.showAlert("✅ Success! You earned 5,000 TTE.");
+            }).catch((result) => {
+                tg.showAlert("❌ Ad not available at the moment. Please try again later.");
+            });
+        }
+
         function adminTrigger() {
             adminClicks++;
             if(adminClicks >= 5) {
@@ -215,11 +230,6 @@
                     db.ref('users').once('value', s => { 
                         document.getElementById('stat-total-users').innerText = s.numChildren(); 
                     });
-                    document.getElementById('adm-task-name').value = currentTask.name;
-                    document.getElementById('adm-task-link').value = currentTask.link;
-                    document.getElementById('adm-task-reward').value = currentTask.reward;
-                } else {
-                    tg.showAlert("Access Denied!");
                 }
                 adminClicks = 0;
             }
@@ -231,12 +241,11 @@
             const reward = parseInt(document.getElementById('adm-task-reward').value);
             if(name && link && reward) {
                 db.ref('adminSettings/task').set({ name, link, reward })
-                .then(() => tg.showAlert("Task Updated Successfully!"))
+                .then(() => tg.showAlert("Task Updated!"))
                 .catch(e => alert(e.message));
             }
         }
 
-        // GAME LOGIC
         function doTask() {
             window.open(currentTask.link, "_blank");
             tg.showConfirm("Did you join the channel?", ok => {
@@ -262,7 +271,7 @@
             el.value = link; document.body.appendChild(el);
             el.select(); document.execCommand('copy');
             document.body.removeChild(el);
-            tg.showAlert("Link Copied! Now share with friends.");
+            tg.showAlert("Link Copied!");
         }
 
         setInterval(() => { if(energy < 1000) { energy = Math.min(1000, energy+2); updateUI(); } }, 1500);
