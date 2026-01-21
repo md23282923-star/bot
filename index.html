@@ -4,43 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TTE - Official Airdrop Bot</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
+    
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js" async></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root { --primary-gold: #ffcc00; --bg-color: #0b0c10; --card-bg: #1f2833; --text-color: #ffffff; }
         body { background: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; user-select: none; }
-        
-        .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .badge { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--primary-gold); cursor: pointer; }
-
         #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; padding: 25px; box-sizing: border-box; overflow-y: auto; }
-        .admin-box { background: #111; border: 1px solid var(--primary-gold); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .admin-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        
         .page { display: none; height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 150px; }
-        .active-page { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+        .active-page { display: block; }
         .balance-container { text-align: center; margin: 30px 0; }
-        .balance-container h1 { font-size: 55px; margin: 0; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
-        
-        .tap-zone { width: 300px; height: 300px; margin: 0 auto; display: flex; align-items: center; justify-content: center; position: relative; }
-        #main-coin { width: 240px; height: 240px; background: radial-gradient(circle, #333 0%, #000 70%); border-radius: 50%; border: 10px solid #1a1a1a; box-shadow: 0 0 40px #000; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
-        #main-coin img { width: 140px; filter: drop-shadow(0 0 10px var(--primary-gold)); }
-        #main-coin:active { transform: scale(0.92); border-color: var(--primary-gold); }
-
+        .balance-container h1 { font-size: 55px; margin: 0; font-weight: 900; color: var(--primary-gold); }
+        .tap-zone { width: 300px; height: 300px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        #main-coin { width: 240px; height: 240px; background: radial-gradient(circle, #333 0%, #000 70%); border-radius: 50%; border: 10px solid #1a1a1a; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+        #main-coin:active { transform: scale(0.92); }
+        #main-coin img { width: 140px; }
         .store-card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); }
-        .btn-gold { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary-gold); color: black; cursor: pointer; margin-top: 10px; font-size: 14px; }
-
+        .btn-gold { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary-gold); color: black; cursor: pointer; }
         .footer-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #111; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
         .nav-item { color: #555; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--primary-gold); }
-        .nav-item i { display: block; font-size: 24px; margin-bottom: 5px; }
-
         .pop-up { position: absolute; color: white; font-size: 35px; font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
     </style>
@@ -48,80 +39,33 @@
 <body>
 
     <div id="admin-panel">
-        <h2 style="color: var(--primary-gold); margin-top:0;">Admin Command Center</h2>
-        <div class="admin-box">
-            <p style="margin:0; font-size: 18px;">Total Users: <b id="stat-total-users" style="color:var(--primary-gold)">0</b></p>
-        </div>
-        <div class="admin-box">
-            <h3 style="margin-top:0;">Update Mission Task</h3>
-            <label style="font-size:12px; color:#aaa;">Task Title:</label>
-            <input type="text" id="adm-task-name" class="admin-input" placeholder="Join Channel">
-            <label style="font-size:12px; color:#aaa;">Telegram Link:</label>
-            <input type="text" id="adm-task-link" class="admin-input" placeholder="https://t.me/...">
-            <label style="font-size:12px; color:#aaa;">Reward Amount:</label>
-            <input type="number" id="adm-task-reward" class="admin-input" placeholder="10000">
-            <button class="btn-gold" onclick="saveAdminTask()">SAVE & UPDATE LIVE</button>
-        </div>
-        <button onclick="document.getElementById('admin-panel').style.display='none'" style="color:#666; background:none; border:none; width:100%; padding:10px;">Back to Game</button>
+        <h2 style="color: var(--primary-gold);">Admin Panel</h2>
+        <button class="btn-gold" onclick="document.getElementById('admin-panel').style.display='none'">Close</button>
     </div>
 
     <div class="header">
         <div class="badge" onclick="adminTrigger()">Lvl 1 Bronze</div>
-        <div style="color: var(--primary-gold); font-weight: bold; letter-spacing: 1px;">TTE ELITE</div>
-        <div class="badge" onclick="tg.showAlert('Wallet coming soon!')"><i class="fas fa-wallet"></i></div>
+        <div style="color: var(--primary-gold); font-weight: bold;">TTE ELITE</div>
+        <div class="badge"><i class="fas fa-wallet"></i></div>
     </div>
 
     <div id="home" class="page active-page">
-        <div class="balance-container">
-            <h1 id="balance">0</h1>
-            <div style="color:var(--primary-gold); font-weight:bold; font-size:14px; letter-spacing:2px;">TTE TOKENS</div>
-        </div>
-        <div class="tap-zone">
-            <div id="main-coin" onclick="handleTouch(event)"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
-        </div>
-        <div style="margin-top: 30px; padding: 0 10px;">
-            <div style="font-size:14px; margin-bottom:8px; display:flex; justify-content:space-between;">
-                <span>⚡ Energy</span>
-                <span><span id="energy">1000</span> / 1000</span>
-            </div>
-            <div style="width:100%; height:8px; background:#222; border-radius:10px;"><div id="eng-bar" style="width:100%; height:100%; background:var(--primary-gold); border-radius:10px; transition: 0.2s;"></div></div>
-        </div>
-    </div>
-
-    <div id="leaderboard" class="page">
-        <h2 style="color: var(--primary-gold); text-align:center;"><i class="fas fa-trophy"></i> Global Ranking</h2>
-        <div id="leader-list">Loading...</div>
-    </div>
-
-    <div id="friends" class="page">
-        <h2 style="color: var(--primary-gold);">Invite Friends</h2>
-        <div class="store-card" style="text-align: center;">
-            <p style="margin-top:0;">Earn <b>5,000 TTE</b> per Friend</p>
-            <button class="btn-gold" onclick="copyRef()">COPY REFERRAL LINK</button>
-        </div>
-        <div class="admin-box" style="border-color:#333;">
-            <p>Your Referrals: <b id="ref-count" style="color:var(--primary-gold)">0</b></p>
-        </div>
+        <div class="balance-container"><h1 id="balance">0</h1><p>TTE TOKENS</p></div>
+        <div class="tap-zone"><div id="main-coin"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div></div>
+        <p>⚡ Energy: <span id="energy">1000</span> / 1000</p>
     </div>
 
     <div id="earn" class="page">
-        <h2 style="color: var(--primary-gold);">Missions</h2>
-        <div class="store-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <div><h3 style="margin:0;">Watch & Earn</h3><p style="margin:5px 0 0 0; color:#ffcc00;">+5,000 TTE</p></div>
-            <button class="btn-gold" style="width:80px; margin-top:0;" onclick="showAd()">Watch</button>
-        </div>
-
-        <div class="store-card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div><h3 id="display-task-name" style="margin:0;">Join Channel</h3><p id="display-task-reward" style="margin:5px 0 0 0; color:#aaa;">+10,000 TTE</p></div>
-            <button class="btn-gold" style="width:80px; margin-top:0;" onclick="doTask()">Go</button>
+        <h2>Missions</h2>
+        <div class="store-card">
+            <p>Watch Video & Earn 5,000 TTE</p>
+            <button class="btn-gold" onclick="showAd()">Watch Ad</button>
         </div>
     </div>
 
     <div class="footer-nav">
-        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-hammer"></i>Earn</div>
-        <div class="nav-item" onclick="nav('leaderboard', this)"><i class="fas fa-trophy"></i>Ranks</div>
-        <div class="nav-item" onclick="nav('friends', this)"><i class="fas fa-user-friends"></i>Friends</div>
-        <div class="nav-item" onclick="nav('earn', this)"><i class="fas fa-tasks"></i>Tasks</div>
+        <div class="nav-item active" onclick="nav('home', this)">Earn</div>
+        <div class="nav-item" onclick="nav('earn', this)">Tasks</div>
     </div>
 
     <script>
@@ -136,150 +80,68 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest_user";
-        const firstName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Player";
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest";
 
-        // --- ADSGRAM CONFIG ---
-        // আপনার প্রাপ্ত Unit ID: 21556 ব্যবহার করা হয়েছে
-        const AdController = window.Adsgram.init({ blockId: "21556" });
+        let balance = 0, energy = 1000, adminClicks = 0;
 
-        let balance = 0, energy = 1000, adminClicks = 0, currentTask = { name: "Join Channel", link: "https://t.me/airdrop_the", reward: 10000 };
-
-        db.ref('adminSettings/task').on('value', snap => {
-            if(snap.exists()) {
-                currentTask = snap.val();
-                document.getElementById('display-task-name').innerText = currentTask.name;
-                document.getElementById('display-task-reward').innerText = "+" + currentTask.reward.toLocaleString() + " TTE";
-            }
-        });
-
-        db.ref('users/' + userId).once('value', snap => {
-            if(!snap.exists()) {
-                let refBy = tg.initDataUnsafe.start_param;
-                if(refBy && refBy != userId) {
-                    db.ref('users/'+refBy).once('value', s => {
-                        if(s.exists()){
-                            let b = (s.val().balance || 0) + 5000;
-                            let r = (s.val().refCount || 0) + 1;
-                            db.ref('users/'+refBy).update({ balance: b, refCount: r });
-                        }
-                    });
-                }
-                db.ref('users/' + userId).set({ balance: 0, name: firstName, refCount: 0 });
-            }
-        });
-
+        // ব্যালেন্স লোড
         db.ref('users/' + userId).on('value', snap => {
             if(snap.exists()) {
                 balance = snap.val().balance || 0;
                 document.getElementById('balance').innerText = balance.toLocaleString();
-                document.getElementById('ref-count').innerText = snap.val().refCount || 0;
+            } else {
+                db.ref('users/' + userId).set({ balance: 0, name: "Player" });
             }
         });
+
+        // ট্যাপ ফাংশন (আগের মতো)
+        document.getElementById('main-coin').addEventListener('touchstart', e => {
+            e.preventDefault();
+            if(energy >= 1) {
+                balance++; energy--;
+                db.ref('users/' + userId).update({ balance: balance });
+                updateUI();
+            }
+        });
+
+        // বিজ্ঞাপন ফাংশন
+        function showAd() {
+            if (window.Adsgram) {
+                const AdController = window.Adsgram.init({ blockId: "21556" });
+                AdController.show().then(() => {
+                    balance += 5000;
+                    db.ref('users/' + userId).update({ balance: balance });
+                    tg.showAlert("✅ 5,000 TTE Added!");
+                }).catch(() => tg.showAlert("Ad failed to load."));
+            } else {
+                tg.showAlert("Adsgram not loaded yet.");
+            }
+        }
 
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            if(id === 'leaderboard') loadLeaderboard();
         }
 
-        // Tapping logic compatible with both touch and click
-        function handleTouch(e) {
-            if(energy >= 1) {
-                balance++; energy--;
-                db.ref('users/' + userId).update({ balance: balance });
-                
-                let x = e.type === 'touchstart' ? e.touches[0].pageX : e.pageX;
-                let y = e.type === 'touchstart' ? e.touches[0].pageY : e.pageY;
-                
-                showPop(x, y);
-                updateUI();
-            }
-        }
-        document.getElementById('main-coin').addEventListener('touchstart', handleTouch);
-
-        function showPop(x, y) {
-            const el = document.createElement('div'); el.className = 'pop-up';
-            el.innerText = '+1'; el.style.left = x + 'px'; el.style.top = y + 'px';
-            document.body.appendChild(el); setTimeout(() => el.remove(), 700);
-        }
-
-        // --- ADSGRAM SHOW FUNCTION ---
-        function showAd() {
-            AdController.show().then((result) => {
-                // বিজ্ঞাপন সফলভাবে দেখলে ৫০০০ পয়েন্ট যোগ হবে
-                balance += 5000;
-                db.ref('users/' + userId).update({ balance: balance });
-                tg.showAlert("✅ Success! You earned 5,000 TTE.");
-            }).catch((result) => {
-                tg.showAlert("❌ Ad not available at the moment. Please try again later.");
-            });
+        function updateUI() {
+            document.getElementById('energy').innerText = energy;
         }
 
         function adminTrigger() {
             adminClicks++;
             if(adminClicks >= 5) {
-                let pass = prompt("Enter Admin Password:");
-                if(pass === "7860") {
-                    document.getElementById('admin-panel').style.display='block';
-                    db.ref('users').once('value', s => { 
-                        document.getElementById('stat-total-users').innerText = s.numChildren(); 
-                    });
-                }
+                if(prompt("Pass:") === "7860") document.getElementById('admin-panel').style.display='block';
                 adminClicks = 0;
             }
         }
 
-        function saveAdminTask() {
-            const name = document.getElementById('adm-task-name').value;
-            const link = document.getElementById('adm-task-link').value;
-            const reward = parseInt(document.getElementById('adm-task-reward').value);
-            if(name && link && reward) {
-                db.ref('adminSettings/task').set({ name, link, reward })
-                .then(() => tg.showAlert("Task Updated!"))
-                .catch(e => alert(e.message));
-            }
-        }
-
-        function doTask() {
-            window.open(currentTask.link, "_blank");
-            tg.showConfirm("Did you join the channel?", ok => {
-                if(ok) { balance += currentTask.reward; db.ref('users/'+userId).update({ balance: balance }); }
-            });
-        }
-
-        function loadLeaderboard() {
-            db.ref('users').orderByChild('balance').limitToLast(10).once('value', snap => {
-                let html = ''; let players = [];
-                snap.forEach(c => players.push(c.val()));
-                players.reverse().forEach((p, i) => {
-                    html += `<div style="display:flex; justify-content:space-between; padding:12px; background:rgba(255,255,255,0.05); margin-bottom:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <span>#${i+1} ${p.name}</span><b>${(p.balance || 0).toLocaleString()}</b></div>`;
-                });
-                document.getElementById('leader-list').innerHTML = html;
-            });
-        }
-
-        function copyRef() {
-            const link = `https://t.me/taptoearn_tte_bot/start?startapp=${userId}`;
-            const el = document.createElement('textarea');
-            el.value = link; document.body.appendChild(el);
-            el.select(); document.execCommand('copy');
-            document.body.removeChild(el);
-            tg.showAlert("Link Copied!");
-        }
-
-        setInterval(() => { if(energy < 1000) { energy = Math.min(1000, energy+2); updateUI(); } }, 1500);
-        function updateUI() {
-            document.getElementById('energy').innerText = energy;
-            document.getElementById('eng-bar').style.width = (energy/10) + "%";
-        }
+        setInterval(() => { if(energy < 1000) { energy++; updateUI(); } }, 2000);
     </script>
 </body>
 </html>
+
 
