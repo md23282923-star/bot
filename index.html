@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ELITE NETWORK - Final Masterpiece</title>
+    <title>ELITE NETWORK - Final Pro</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -12,170 +12,155 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --gold: #ffcc00; --bg: #0a0a0a; --card-bg: #151515; --elite-grad: linear-gradient(135deg, #ffcc00, #ffb300); }
+        :root { --gold: #ffcc00; --bg: #000; --card: #121212; --elite-grad: linear-gradient(135deg, #ffcc00, #ff9900); }
+        body { background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; user-select: none; }
         
-        body { 
-            background-color: var(--bg); color: #fff; font-family: 'Inter', -apple-system, sans-serif;
-            margin: 0; padding: 0; overflow: hidden; user-select: none;
-        }
+        .header-stats { background: rgba(0,0,0,0.7); padding: 12px; text-align: center; border-bottom: 1px solid #222; font-size: 11px; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
 
-        /* Top Header Stats */
-        .top-stats { 
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); 
-            padding: 12px; text-align: center; border-bottom: 1px solid #222; 
-            font-size: 11px; font-weight: bold; color: var(--gold);
-        }
+        .page { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 130px; }
+        .active-page { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .page { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 120px; }
-        .active-page { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Balance Styling */
-        .balance-container { text-align: center; margin-top: 15px; }
-        .balance-container h1 { font-size: 50px; margin: 0; font-weight: 900; background: var(--elite-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .token-info { font-size: 10px; letter-spacing: 3px; color: #888; text-transform: uppercase; }
-
-        /* The BIG Coin */
-        .coin-wrap { display: flex; justify-content: center; margin: 40px 0; }
-        .main-coin {
-            width: 240px; height: 240px; border-radius: 50%;
+        /* Balance & Formatting */
+        .balance-box { text-align: center; margin-top: 10px; }
+        .balance-box h1 { font-size: 50px; margin: 0; background: var(--elite-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
+        
+        /* Premium CSS Coin (No Image) */
+        .coin-container { display: flex; justify-content: center; margin: 30px 0; }
+        #coin { 
+            width: 250px; height: 250px; border-radius: 50%; 
             background: radial-gradient(circle, #ffd700 0%, #b8860b 100%);
             border: 10px solid #1a1a1a; position: relative;
-            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2), inset 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2), inset 0 0 15px rgba(0,0,0,0.5);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.05s;
+            transition: transform 0.05s; cursor: pointer;
         }
-        .main-coin:active { transform: scale(0.92); }
-        .main-coin span { font-size: 45px; font-weight: 900; color: #000; letter-spacing: 2px; text-shadow: 1px 1px 0px rgba(255,255,255,0.3); }
+        #coin::after { content: "ELITE"; font-size: 40px; font-weight: 900; color: #000; letter-spacing: 2px; }
+        #coin:active { transform: scale(0.94); }
 
         /* Action Buttons */
-        .mine-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .action-card { 
-            background: var(--card-bg); border: 1px solid #222; border-radius: 16px; 
-            padding: 15px; text-align: center; transition: 0.2s;
+        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .btn-action { 
+            background: var(--card); border: 1px solid #222; color: #fff; 
+            padding: 15px; border-radius: 15px; font-weight: bold; font-size: 14px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
         }
-        .action-card:active { border-color: var(--gold); }
-        .action-card i { font-size: 24px; color: var(--gold); margin-bottom: 8px; display: block; }
-        .action-card span { font-size: 13px; font-weight: bold; }
+        .btn-action i { color: var(--gold); font-size: 20px; }
+        .btn-action:active { border-color: var(--gold); background: #1a1a1a; }
 
-        /* Bottom Navigation */
-        .navbar { 
-            position: fixed; bottom: 0; width: 100%; height: 80px; 
-            background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000;
-        }
-        .nav-link { flex: 1; text-align: center; padding-top: 15px; color: #555; transition: 0.2s; }
-        .nav-link.active { color: var(--gold); }
-        .nav-link i { font-size: 22px; display: block; margin-bottom: 5px; }
-        .nav-link span { font-size: 10px; font-weight: bold; }
+        /* Bottom Nav (4 Menus) */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #000; display: flex; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; padding-top: 15px; color: #555; font-size: 10px; font-weight: bold; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 24px; display: block; margin-bottom: 4px; }
 
         /* Energy Bar */
-        .energy-section { background: #111; padding: 12px; border-radius: 12px; margin-top: 25px; border: 1px solid #1a1a1a; }
-        .bar-bg { height: 8px; background: #222; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        .card { background: var(--card); border-radius: 15px; padding: 15px; margin-top: 20px; border: 1px solid #222; }
+        .bar-bg { height: 8px; background: #222; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--elite-grad); width: 100%; transition: 0.3s; }
 
-        /* Spin Popup */
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 9999; }
-        .modal-content { text-align: center; padding-top: 60px; }
-        .wheel-box { width: 280px; height: 280px; border: 8px solid var(--gold); border-radius: 50%; margin: 20px auto; position: relative; transition: 4s cubic-bezier(0.1, 0, 0.1, 1); background: #111; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; }
+        /* Spin Wheel Modal UI */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; text-align: center; padding-top: 40px; }
+        .wheel-container { 
+            position: relative; width: 280px; height: 280px; margin: 25px auto; 
+            border: 12px solid #1a1a1a; border-radius: 50%; box-shadow: 0 0 30px var(--gold);
+            overflow: hidden; background: conic-gradient(#ffcc00 0deg 45deg, #111 45deg 90deg, #ffcc00 90deg 135deg, #111 135deg 180deg, #ffcc00 180deg 225deg, #111 225deg 270deg, #ffcc00 270deg 315deg, #111 315deg 360deg);
+            transition: 4s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 35px; height: 35px; background: #fff; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 2010; }
 
-        /* Float Anim */
-        .float-text { position: absolute; font-weight: 900; font-size: 30px; color: #fff; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
-        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-120px); } }
+        /* Float Animation */
+        .float-text { position: absolute; color: #fff; font-weight: 900; font-size: 32px; animation: floatUp 0.7s ease-out forwards; pointer-events: none; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130px); } }
 
-        .btn-gold { background: var(--elite-grad); color: #000; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; width: 100%; }
-        input { width: 100%; padding: 14px; background: #111; border: 1px solid #222; color: #fff; border-radius: 10px; box-sizing: border-box; }
+        .btn-gold { background: var(--elite-grad); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; }
+        input { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="top-stats">GLOBAL MINED: <span id="global-val">0.00M</span> TTE</div>
+    <div class="header-stats">TOTAL COMMUNITY MINED: <span id="global-mined" style="color:var(--gold)">0.00M</span></div>
 
     <div id="mine" class="page active-page">
-        <div class="balance-container">
-            <div class="token-info">Your TTE Balance</div>
+        <div class="balance-box">
             <h1 id="balance">0</h1>
+            <div style="font-size:12px; letter-spacing:2px; color:#888;">TTE TOKENS</div>
         </div>
 
-        <div class="coin-wrap">
-            <div class="main-coin" id="tap-coin" onclick="handleTap(event)">
-                <span>ELITE</span>
-            </div>
+        <div class="coin-container">
+            <div id="coin" onclick="handleTap(event)"></div>
         </div>
 
-        <div class="mine-actions">
-            <div class="action-card" onclick="openSpin()">
-                <i class="fas fa-dharmachakra"></i>
-                <span>Lucky Spin</span>
-            </div>
-            <div class="action-card" onclick="startTurbo()">
-                <i class="fas fa-bolt"></i>
-                <span>Turbo 5X</span>
-            </div>
+        <div class="action-row">
+            <div class="btn-action" onclick="openSpin()"><i class="fas fa-dharmachakra"></i><span>Lucky Spin</span></div>
+            <div class="btn-action" onclick="activateTurbo()"><i class="fas fa-bolt"></i><span>Turbo 5X</span></div>
         </div>
 
-        <div class="energy-section">
+        <div class="card">
             <div style="display:flex; justify-content:space-between; font-size:12px;">
-                <span>⚡ Energy: <span id="en-val">1000</span></span>
-                <span id="mode-text" style="color:var(--gold)">Normal</span>
+                <span>⚡ Energy: <span id="en-val">1000</span>/1000</span>
+                <span id="turbo-status" style="color:var(--gold)">Normal</span>
             </div>
-            <div class="bar-bg"><div class="bar-fill" id="en-bar"></div></div>
+            <div class="bar-bg"><div id="en-bar" class="bar-fill"></div></div>
         </div>
     </div>
 
     <div id="tasks" class="page">
-        <h2 style="color:var(--gold)">Daily Tasks</h2>
-        <div class="action-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <div style="text-align:left;"><b>Video Advertisement</b><br><small style="color:var(--gold)">+2,000 TTE & 1 Spin</small></div>
-            <button class="btn-gold" style="width:auto;" onclick="watchAd()">Watch</button>
+        <h2 style="color:var(--gold)">Missions</h2>
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div><b>Daily Video Ads</b><br><small style="color:var(--gold)">+2,000 TTE & 1 Spin</small></div>
+            <button class="btn-gold" style="width:auto;" onclick="watchAdTask()">Watch</button>
         </div>
-        <div id="admin-task-list"></div>
+        <div id="admin-tasks-container"></div>
     </div>
 
     <div id="refer" class="page">
         <h2 style="color:var(--gold)">Invite Friends</h2>
-        <div class="action-card">
-            <p style="font-size:13px;">Get <b>20,000 TTE</b> per friend + 10% commission.</p>
-            <input type="text" id="ref-url" readonly>
-            <button class="btn-gold" style="margin-top:10px;" onclick="copyLink()">Copy Link</button>
+        <div class="card">
+            <p style="font-size:13px;">Get <b>20,000 TTE</b> per friend + 10% Commission!</p>
+            <input type="text" id="ref-link" readonly style="margin-bottom:10px;">
+            <button class="btn-gold" onclick="copyRef()">Copy Referral Link</button>
         </div>
-        <h3 style="margin-top:20px;">Top Referrals</h3>
+        <h4>Top Referrers</h4>
         <div id="leaderboard"></div>
     </div>
 
     <div id="airdrop" class="page">
-        <h2 style="color:var(--gold)">Airdrop & Assets</h2>
-        <div class="action-card" style="border-left: 4px solid var(--gold); text-align:left;">
+        <h2 style="color:var(--gold)">Airdrop Asset</h2>
+        <div class="card" style="border-left: 5px solid var(--gold);">
             <div style="color:#888; font-size:12px;">Premium Asset Balance</div>
-            <div style="font-size:28px; font-weight:900; color:var(--gold);"><span id="elite-asset">0.00</span> ELITE</div>
+            <div style="font-size:30px; font-weight:900; color:var(--gold);"><span id="elite-asset">0.00</span> $ELITE</div>
+            <p style="font-size:10px; color:#555; margin-top:5px;">Value Estimate: 1 $ELITE ≈ $10.00+</p>
         </div>
-        
-        <div class="action-card" style="margin-top:20px;">
-            <p style="font-size:13px;">Enter TON Wallet (UQ...) for listing distribution.</p>
-            <input type="text" id="ton-addr" placeholder="Wallet Address">
-            <button class="btn-gold" style="margin-top:15px;" onclick="saveTon()">SAVE WALLET</button>
+        <div class="card">
+            <p style="font-size:12px;">Save TON Wallet for listing.</p>
+            <input type="text" id="wallet-addr" placeholder="UQ... Enter Address">
+            <button class="btn-gold" style="margin-top:10px;" onclick="saveWallet()">REGISTER WALLET</button>
         </div>
     </div>
 
-    <div class="navbar">
-        <div class="nav-link active" onclick="nav('mine', this)"><i class="fas fa-hammer"></i><span>MINE</span></div>
-        <div class="nav-link" onclick="nav('tasks', this)"><i class="fas fa-tasks"></i><span>TASKS</span></div>
-        <div class="nav-link" onclick="nav('refer', this)"><i class="fas fa-users"></i><span>FRIENDS</span></div>
-        <div class="nav-link" onclick="nav('airdrop', this)"><i class="fas fa-wallet"></i><span>AIRDROP</span></div>
-    </div>
+    <nav class="nav">
+        <div class="nav-item active" onclick="nav('mine', this)"><i class="fas fa-hammer"></i><span>MINE</span></div>
+        <div class="nav-item" onclick="nav('tasks', this)"><i class="fas fa-tasks"></i><span>TASKS</span></div>
+        <div class="nav-item" onclick="nav('refer', this)"><i class="fas fa-users"></i><span>REFER</span></div>
+        <div class="nav-item" onclick="nav('airdrop', this)"><i class="fas fa-wallet"></i><span>AIRDROP</span></div>
+    </nav>
 
     <div id="spin-modal" class="modal">
         <div class="modal-content">
-            <h2 style="color:var(--gold); margin-bottom:0;">LUCKY SPIN</h2>
-            <p style="font-size:12px;">Win $ELITE Assets</p>
-            <div id="spin-wheel" class="wheel-box">?</div>
-            <p>Spins Left: <span id="spin-num">0</span></p>
-            <button class="btn-gold" style="width:200px;" onclick="spin()">SPIN NOW</button>
-            <button onclick="closeSpin()" style="background:none; border:none; color:#888; margin-top:30px; display:block; width:100%;">BACK TO MINE</button>
+            <h2 style="color:var(--gold)">LUCKY WHEEL</h2>
+            <div style="position:relative; width:280px; margin:auto;">
+                <div class="wheel-pointer"></div>
+                <div id="wheel" class="wheel-container"></div>
+            </div>
+            <p>Spins Left: <span id="sp-count" style="color:var(--gold); font-weight:bold;">0</span></p>
+            <button class="btn-gold" style="width:220px;" onclick="spinNow()">SPIN NOW</button>
+            <button onclick="closeSpin()" style="background:none; border:none; color:#555; margin-top:30px; display:block; width:100%;">BACK</button>
         </div>
     </div>
 
     <script>
-        // --- Firebase Config (Do not change) ---
+        // --- Firebase (Don't Change) ---
         const firebaseConfig = {
             apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
             authDomain: "tte-game.firebaseapp.com",
@@ -190,15 +175,15 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const uid = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "test_88";
+        const uid = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "user_test_pro";
         let bal = 0, asset = 0, en = 1000, sp = 0, totSp = 0, power = 1;
 
-        // Million Formatting
+        // Million Formatting Logic
         function format(n) {
             return n >= 1000000 ? (n/1000000).toFixed(2) + 'M' : Math.floor(n).toLocaleString();
         }
 
-        // Sync User Data
+        // Data Sync
         db.ref('users/' + uid).on('value', s => {
             const d = s.val();
             if(d) {
@@ -208,17 +193,16 @@
                 totSp = d.totalSpins || 0;
                 document.getElementById('balance').innerText = format(bal);
                 document.getElementById('elite-asset').innerText = asset.toFixed(2);
-                document.getElementById('spin-num').innerText = sp;
-                document.getElementById('ref-url').value = "https://t.me/taptoearn_tte_bot?start=" + uid;
-                if(d.wallet) document.getElementById('ton-addr').value = d.wallet;
+                document.getElementById('sp-count').innerText = sp;
+                document.getElementById('ref-link').value = "https://t.me/taptoearn_tte_bot?start=" + uid;
+                if(d.wallet) document.getElementById('wallet-addr').value = d.wallet;
             } else {
                 db.ref('users/' + uid).set({ balance: 0, eliteAsset: 0, spins: 1 });
             }
         });
 
-        // Sync Global Stats
         db.ref('global_m').on('value', s => {
-            document.getElementById('global-val').innerText = format(s.val() || 0);
+            document.getElementById('global-mined').innerText = format(s.val() || 0);
         });
 
         function handleTap(e) {
@@ -232,38 +216,41 @@
             }
         }
 
-        function startTurbo() {
+        function activateTurbo() {
             const Ad = window.Adsgram.init({ blockId: "21556" });
             Ad.show().then(() => {
-                power = 5; document.getElementById('mode-text').innerText = "TURBO 5X";
-                setTimeout(() => { power = 1; document.getElementById('mode-text').innerText = "Normal"; }, 60000);
+                power = 5; document.getElementById('turbo-status').innerText = "TURBO 5X ACTIVE";
+                setTimeout(() => { power = 1; document.getElementById('turbo-status').innerText = "Normal"; }, 60000);
             });
         }
 
         function openSpin() { document.getElementById('spin-modal').style.display='block'; }
         function closeSpin() { document.getElementById('spin-modal').style.display='none'; }
 
-        function spin() {
+        function spinNow() {
             if(sp > 0) {
-                const w = document.getElementById('spin-wheel');
-                w.style.transform = `rotate(${Math.floor(Math.random()*3000)+360}deg)`;
+                const w = document.getElementById('wheel');
+                const deg = 3600 + Math.floor(Math.random() * 360);
+                w.style.transform = `rotate(${deg}deg)`;
                 sp--; totSp++;
+                db.ref('users/' + uid).update({ spins: sp, totalSpins: totSp });
+
                 setTimeout(() => {
-                    let prize = (Math.random()*0.1).toFixed(2);
-                    if(totSp % 20 === 0) prize = 1.00; // Secret 20-spin logic
+                    let prize = (Math.random() * 0.05).toFixed(2);
+                    if(totSp % 20 === 0) prize = 1.00; // Secret 20-spin Logic
                     asset = parseFloat(asset) + parseFloat(prize);
-                    db.ref('users/' + uid).update({ spins: sp, eliteAsset: asset, totalSpins: totSp });
-                    tg.showAlert("Winner! You got " + prize + " $ELITE");
-                }, 4000);
-            } else { tg.showAlert("No spins left! Watch ads to get more."); }
+                    db.ref('users/' + uid).update({ eliteAsset: asset });
+                    tg.showAlert("Winner! You got " + prize + " $ELITE Asset!");
+                }, 4100);
+            } else { tg.showAlert("No spins! Watch Ads."); }
         }
 
-        function watchAd() {
+        function watchAdTask() {
             const Ad = window.Adsgram.init({ blockId: "21556" });
             Ad.show().then(() => {
                 bal += 2000; sp += 1;
                 db.ref('users/' + uid).update({ balance: bal, spins: sp });
-                tg.showAlert("Reward: +2,000 TTE & +1 Spin!");
+                tg.showAlert("+2,000 TTE & +1 Spin Added!");
             });
         }
 
@@ -275,7 +262,7 @@
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
 
@@ -285,12 +272,12 @@
             const t = document.createElement('div');
             t.className = 'float-text'; t.style.left = x+'px'; t.style.top = y+'px';
             t.innerText = '+' + power; document.body.appendChild(t);
-            setTimeout(() => t.remove(), 600);
+            setTimeout(() => t.remove(), 700);
         }
 
-        function saveTon() {
-            db.ref('users/' + uid).update({ wallet: document.getElementById('ton-addr').value });
-            tg.showAlert("Wallet Address Saved!");
+        function saveWallet() {
+            db.ref('users/' + uid).update({ wallet: document.getElementById('wallet-addr').value });
+            tg.showAlert("TON Wallet Registered!");
         }
 
         setInterval(() => { if(en < 1000) en += 3; updateUI(); }, 1500);
