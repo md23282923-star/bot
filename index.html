@@ -4,47 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TTE ELITE</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         body { background: #0b0c10; color: white; font-family: sans-serif; margin: 0; text-align: center; user-select: none; touch-action: manipulation; }
-        .header { display: flex; justify-content: space-between; padding: 15px; background: #1f2833; }
-        #main-coin { width: 220px; height: 220px; background: radial-gradient(#444, #000); border-radius: 50%; margin: 50px auto; border: 8px solid #ffcc00; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-        #main-coin:active { transform: scale(0.95); }
+        .header { display: flex; justify-content: space-between; padding: 15px; background: #1f2833; font-weight: bold; border-bottom: 1px solid #333; }
         .page { display: none; padding: 20px; }
         .active-page { display: block; }
-        .footer { position: fixed; bottom: 0; width: 100%; height: 70px; background: #111; display: flex; border-top: 1px solid #333; }
-        .nav-item { flex: 1; padding: 15px; color: #555; }
+        #main-coin { width: 220px; height: 220px; background: radial-gradient(#444, #000); border-radius: 50%; margin: 50px auto; border: 8px solid #ffcc00; display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; box-shadow: 0 0 20px rgba(255, 204, 0, 0.2); }
+        #main-coin:active { transform: scale(0.95); }
+        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #111; display: flex; border-top: 1px solid #333; }
+        .nav-item { flex: 1; padding: 15px; color: #555; cursor: pointer; font-size: 14px; }
         .nav-item.active { color: #ffcc00; }
+        .btn-gold { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <div onclick="adminTrigger()">Level 1</div>
-        <div id="top-balance">0</div>
+        <div id="balance-top">0</div>
     </div>
 
     <div id="home" class="page active-page">
-        <h1 id="balance">0</h1>
+        <h1 id="balance" style="font-size: 45px; margin-bottom: 10px;">0</h1>
         <div id="main-coin" onclick="handleTap()">
             <img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png" width="120">
         </div>
-        <p>⚡ Energy: <span id="energy">1000</span>/1000</p>
+        <p style="font-size: 18px;">⚡ Energy: <span id="energy">1000</span>/1000</p>
     </div>
 
     <div id="earn" class="page">
         <h2>Missions</h2>
-        <button style="background:#ffcc00; padding:15px; border-radius:10px; font-weight:bold;" onclick="showAd()">Watch Video (+5000)</button>
+        <div style="background:#1f2833; padding:20px; border-radius:15px; border: 1px solid #ffcc00;">
+            <p>Watch a video to earn bonus!</p>
+            <button class="btn-gold" onclick="showAd()">Watch Video (+5000)</button>
+        </div>
     </div>
 
-    <div class="footer">
+    <div class="footer-nav">
         <div class="nav-item active" onclick="nav('home', this)">Earn</div>
         <div class="nav-item" onclick="nav('earn', this)">Missions</div>
     </div>
 
     <script>
+        // আপনার সঠিক Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAN1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
             authDomain: "tte-game.firebaseapp.com",
@@ -56,50 +65,77 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
+        // Adsgram Block ID: 21556
+        const AdController = window.Adsgram.init({ blockId: "21556" });
+        
         const tg = window.Telegram.WebApp;
         tg.expand();
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest_user";
 
-        // আপনার UnitID: 21556 ব্যবহার করা হয়েছে
-        const AdController = window.Adsgram.init({ blockId: "21556" });
+        let balance = 0, energy = 1000, adminClicks = 0;
 
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest";
-        let balance = 0, energy = 1000;
-
-        // ডেটা লোড করা
+        // ডেটাবেস থেকে ইউজারের ব্যালেন্স লোড করা
         db.ref('users/' + userId).on('value', (snap) => {
-            if (snap.exists()) {
+            if(snap.exists()) {
                 balance = snap.val().balance || 0;
-                document.getElementById('balance').innerText = balance;
-                document.getElementById('top-balance').innerText = balance;
+                document.getElementById('balance').innerText = balance.toLocaleString();
+                document.getElementById('balance-top').innerText = balance.toLocaleString();
             } else {
+                // নতুন ইউজার হলে ডাটাবেসে এন্ট্রি করা
                 db.ref('users/' + userId).set({ balance: 0, name: "Player" });
             }
         });
 
+        // ট্যাপ ফাংশন
         function handleTap() {
-            if (energy > 0) {
-                balance++; energy--;
-                document.getElementById('balance').innerText = balance;
+            if(energy > 0) {
+                balance++;
+                energy--;
+                document.getElementById('balance').innerText = balance.toLocaleString();
+                document.getElementById('balance-top').innerText = balance.toLocaleString();
                 document.getElementById('energy').innerText = energy;
-                // সাথে সাথে ডাটাবেসে সেভ হবে
+                
+                // প্রতি ট্যাপে ডাটাবেস আপডেট করা
                 db.ref('users/' + userId).update({ balance: balance });
             }
         }
 
+        // বিজ্ঞাপন দেখানো এবং পুরস্কার দেওয়া
         function showAd() {
-            AdController.show().then(() => {
+            AdController.show().then((result) => {
                 balance += 5000;
                 db.ref('users/' + userId).update({ balance: balance });
-                tg.showAlert("✅ 5,000 Points Added!");
-            }).catch(() => tg.showAlert("❌ Ad not ready."));
+                tg.showAlert("✅ 5,000 Points Added Successfully!");
+            }).catch((result) => {
+                tg.showAlert("❌ Ads are not ready. Please try again after 1 minute.");
+            });
         }
 
+        // পেজ পরিবর্তন
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
+
+        function adminTrigger() {
+            adminClicks++;
+            if(adminClicks >= 5) {
+                let p = prompt("Admin Password:");
+                if(p === "7860") tg.showAlert("Admin Mode Active!");
+                adminClicks = 0;
+            }
+        }
+
+        // অটো এনার্জি রিকভারি
+        setInterval(() => {
+            if(energy < 1000) {
+                energy++;
+                document.getElementById('energy').innerText = energy;
+            }
+        }, 1500);
     </script>
 </body>
 </html>
