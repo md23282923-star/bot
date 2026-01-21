@@ -10,25 +10,24 @@
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <style>
         body { background: #0b0c10; color: white; font-family: sans-serif; margin: 0; text-align: center; user-select: none; touch-action: manipulation; }
-        .header { display: flex; justify-content: space-between; padding: 15px; background: #1f2833; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; padding: 15px; background: #1f2833; }
+        #main-coin { width: 220px; height: 220px; background: radial-gradient(#444, #000); border-radius: 50%; margin: 50px auto; border: 8px solid #ffcc00; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+        #main-coin:active { transform: scale(0.95); }
         .page { display: none; padding: 20px; }
         .active-page { display: block; }
-        #main-coin { width: 220px; height: 220px; background: radial-gradient(#444, #000); border-radius: 50%; margin: 50px auto; border: 8px solid #ffcc00; display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        #main-coin:active { transform: scale(0.95); }
-        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #111; display: flex; border-top: 1px solid #333; }
-        .nav-item { flex: 1; padding: 15px; color: #555; cursor: pointer; }
+        .footer { position: fixed; bottom: 0; width: 100%; height: 70px; background: #111; display: flex; border-top: 1px solid #333; }
+        .nav-item { flex: 1; padding: 15px; color: #555; }
         .nav-item.active { color: #ffcc00; }
-        .btn-gold { background: #ffcc00; color: black; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="header">
         <div onclick="adminTrigger()">Level 1</div>
-        <div id="balance-top">0</div>
+        <div id="top-balance">0</div>
     </div>
 
     <div id="home" class="page active-page">
-        <h1 id="balance" style="font-size: 40px;">0</h1>
+        <h1 id="balance">0</h1>
         <div id="main-coin" onclick="handleTap()">
             <img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png" width="120">
         </div>
@@ -37,13 +36,10 @@
 
     <div id="earn" class="page">
         <h2>Missions</h2>
-        <div style="background:#1f2833; padding:20px; border-radius:15px;">
-            <p>Watch a video to earn bonus!</p>
-            <button class="btn-gold" onclick="showAd()">Watch Video (+5000)</button>
-        </div>
+        <button style="background:#ffcc00; padding:15px; border-radius:10px; font-weight:bold;" onclick="showAd()">Watch Video (+5000)</button>
     </div>
 
-    <div class="footer-nav">
+    <div class="footer">
         <div class="nav-item active" onclick="nav('home', this)">Earn</div>
         <div class="nav-item" onclick="nav('earn', this)">Missions</div>
     </div>
@@ -60,51 +56,42 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
-        // Adsgram Block ID
-        const AdController = window.Adsgram.init({ blockId: "21556" });
-        
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest_user";
 
-        let balance = 0, energy = 1000, adminClicks = 0;
+        // আপনার UnitID: 21556 ব্যবহার করা হয়েছে
+        const AdController = window.Adsgram.init({ blockId: "21556" });
+
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest";
+        let balance = 0, energy = 1000;
 
         // ডেটা লোড করা
         db.ref('users/' + userId).on('value', (snap) => {
-            if(snap.exists()) {
+            if (snap.exists()) {
                 balance = snap.val().balance || 0;
-                document.getElementById('balance').innerText = balance.toLocaleString();
-                document.getElementById('balance-top').innerText = balance.toLocaleString();
+                document.getElementById('balance').innerText = balance;
+                document.getElementById('top-balance').innerText = balance;
             } else {
                 db.ref('users/' + userId).set({ balance: 0, name: "Player" });
             }
         });
 
         function handleTap() {
-            if(energy > 0) {
-                balance++;
-                energy--;
-                updateUI();
-                // প্রতি ১০ ট্যাপে একবার ডাটাবেসে সেভ হবে (পারফরম্যান্সের জন্য)
-                if(balance % 5 === 0) {
-                    db.ref('users/' + userId).update({ balance: balance });
-                }
+            if (energy > 0) {
+                balance++; energy--;
+                document.getElementById('balance').innerText = balance;
+                document.getElementById('energy').innerText = energy;
+                // সাথে সাথে ডাটাবেসে সেভ হবে
+                db.ref('users/' + userId).update({ balance: balance });
             }
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerText = balance.toLocaleString();
-            document.getElementById('balance-top').innerText = balance.toLocaleString();
-            document.getElementById('energy').innerText = energy;
         }
 
         function showAd() {
             AdController.show().then(() => {
                 balance += 5000;
                 db.ref('users/' + userId).update({ balance: balance });
-                tg.showAlert("✅ 5,000 TTE Tokens Added!");
-            }).catch(() => tg.showAlert("❌ Ads are not ready. Try again later."));
+                tg.showAlert("✅ 5,000 Points Added!");
+            }).catch(() => tg.showAlert("❌ Ad not ready."));
         }
 
         function nav(id, el) {
@@ -113,23 +100,7 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
-
-        function adminTrigger() {
-            adminClicks++;
-            if(adminClicks >= 5) {
-                let p = prompt("Admin Password?");
-                if(p === "7860") tg.showAlert("Admin Mode Active!");
-                adminClicks = 0;
-            }
-        }
-
-        // এনার্জি রিকভারি
-        setInterval(() => {
-            if(energy < 1000) {
-                energy++;
-                document.getElementById('energy').innerText = energy;
-            }
-        }, 2000);
     </script>
 </body>
 </html>
+
