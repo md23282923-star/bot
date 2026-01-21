@@ -3,70 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TTE - Official Airdrop Bot</title>
+    <title>ELITE NETWORK - Airdrop 2026</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js" async></script>
-    
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <style>
-        :root { --primary-gold: #ffcc00; --bg-color: #0b0c10; --card-bg: #1f2833; --text-color: #ffffff; }
-        body { background: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; user-select: none; }
-        .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .badge { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--primary-gold); cursor: pointer; }
-        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; padding: 25px; box-sizing: border-box; overflow-y: auto; }
-        .page { display: none; height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 150px; }
-        .active-page { display: block; }
-        .balance-container { text-align: center; margin: 30px 0; }
-        .balance-container h1 { font-size: 55px; margin: 0; font-weight: 900; color: var(--primary-gold); }
-        .tap-zone { width: 300px; height: 300px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        #main-coin { width: 240px; height: 240px; background: radial-gradient(circle, #333 0%, #000 70%); border-radius: 50%; border: 10px solid #1a1a1a; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-        #main-coin:active { transform: scale(0.92); }
-        #main-coin img { width: 140px; }
-        .store-card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); }
-        .btn-gold { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary-gold); color: black; cursor: pointer; }
-        .footer-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #111; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
-        .nav-item { color: #555; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
-        .nav-item.active { color: var(--primary-gold); }
-        .pop-up { position: absolute; color: white; font-size: 35px; font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+        :root { --gold: #ffcc00; --bg: #000000; --card: #121212; --text: #ffffff; --elite-grad: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%); }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(0,0,0,0.95); border-bottom: 1px solid #222; position: sticky; top:0; z-index: 100; }
+        .page { display: none; height: 100vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 160px; }
+        .active-page { display: block; animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Balance */
+        .balance-section { text-align: center; margin: 25px 0; }
+        .balance-section h1 { font-size: 48px; margin: 0; background: var(--elite-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
+        .mining-text { font-size: 10px; letter-spacing: 2px; color: var(--gold); margin-top: 5px; font-weight: bold; opacity: 0.8; }
+
+        /* Coin */
+        .coin-container { display: flex; justify-content: center; margin: 20px 0; }
+        #coin { width: 220px; height: 220px; background: radial-gradient(circle, #222 0%, #050505 100%); border-radius: 50%; border: 8px solid #1a1a1a; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 0 40px rgba(255, 204, 0, 0.1); position: relative; touch-action: manipulation; }
+        #coin:active { transform: scale(0.95); border-color: var(--gold); }
+        #coin h2 { font-size: 35px; font-weight: 900; color: var(--gold); letter-spacing: 3px; pointer-events: none; }
+        
+        /* Progress */
+        .stats-card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid #222; margin-top: 20px; }
+        .progress-container { height: 10px; background: #222; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        #energy-bar { height: 100%; background: var(--elite-grad); width: 100%; transition: 0.2s; }
+
+        /* Nav */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #080808; display: flex; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; padding-top: 15px; color: #555; font-size: 11px; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        /* Task */
+        .task-card { background: #151515; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
+        .btn-action { background: var(--gold); color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
+        
+        .tap-anim { position: absolute; color: var(--gold); font-weight: 900; font-size: 26px; animation: floatUp 0.6s ease-out forwards; pointer-events: none; }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
 
-    <div id="admin-panel">
-        <h2 style="color: var(--primary-gold);">Admin Panel</h2>
-        <button class="btn-gold" onclick="document.getElementById('admin-panel').style.display='none'">Close</button>
-    </div>
-
     <div class="header">
-        <div class="badge" onclick="adminTrigger()">Lvl 1 Bronze</div>
-        <div style="color: var(--primary-gold); font-weight: bold;">TTE ELITE</div>
-        <div class="badge"><i class="fas fa-wallet"></i></div>
+        <div style="font-weight: 900; color: var(--gold);">ELITE NETWORK</div>
+        <div style="font-size: 10px; background: #ffcc00; color: #000; padding: 2px 10px; border-radius: 20px; font-weight: bold;">PHASE 1</div>
     </div>
 
     <div id="home" class="page active-page">
-        <div class="balance-container"><h1 id="balance">0</h1><p>TTE TOKENS</p></div>
-        <div class="tap-zone"><div id="main-coin"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div></div>
-        <p>⚡ Energy: <span id="energy">1000</span> / 1000</p>
-    </div>
-
-    <div id="earn" class="page">
-        <h2>Missions</h2>
-        <div class="store-card">
-            <p>Watch Video & Earn 5,000 TTE</p>
-            <button class="btn-gold" onclick="showAd()">Watch Ad</button>
+        <div class="balance-section">
+            <h1 id="balance">0</h1>
+            <div class="mining-text">MINING TTE FOR $ELITE</div>
+        </div>
+        <div class="coin-container">
+            <div id="coin" onclick="handleTap(event)"><h2>ELITE</h2></div>
+        </div>
+        <div class="stats-card">
+            <div style="display:flex; justify-content:space-between; font-size: 12px;">
+                <span>⚡ ENERGY: <span id="energy-val">1000</span></span>
+                <span id="boost-status" style="color:#00ffcc">AUTO: OFF</span>
+            </div>
+            <div class="progress-container"><div id="energy-bar"></div></div>
         </div>
     </div>
 
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="nav('home', this)">Earn</div>
-        <div class="nav-item" onclick="nav('earn', this)">Tasks</div>
+    <div id="tasks" class="page">
+        <h2 style="color:var(--gold)">Missions</h2>
+        <div class="task-card">
+            <div><b>Daily Video</b><br><small style="color:var(--gold)">+10k TTE & 6H Auto</small></div>
+            <button class="btn-action" onclick="showAd()">Watch</button>
+        </div>
+        <div class="task-card">
+            <div><b>Join Channel</b><br><small style="color:#aaa">+50k TTE</small></div>
+            <button class="btn-action" onclick="verifyTask('https://t.me/taptoearn_tte_bot')">Join</button>
+        </div>
     </div>
+
+    <div id="airdrop" class="page">
+        <h2 style="color:var(--gold)">Wallet</h2>
+        <div class="stats-card">
+            <p style="font-size: 13px;">Enter TON Wallet for June 2026 Airdrop.</p>
+            <input type="text" id="wallet-addr" placeholder="UQ..." style="width:100%; padding:12px; background:#000; border:1px solid #333; border-radius:8px; color:#fff; box-sizing: border-box;">
+            <button class="btn-action" style="width:100%; margin-top:10px;" onclick="saveWallet()">Save Wallet</button>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-coins"></i>Mine</div>
+        <div class="nav-item" onclick="nav('tasks', this)"><i class="fas fa-bolt"></i>Earn</div>
+        <div class="nav-item" onclick="nav('airdrop', this)"><i class="fas fa-wallet"></i>Airdrop</div>
+    </nav>
 
     <script>
         const firebaseConfig = {
@@ -82,41 +115,70 @@
         const db = firebase.database();
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest";
 
-        let balance = 0, energy = 1000, adminClicks = 0;
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "test_user";
+        let balance = 0, energy = 1000;
 
-        // ব্যালেন্স লোড
-        db.ref('users/' + userId).on('value', snap => {
-            if(snap.exists()) {
-                balance = snap.val().balance || 0;
-                document.getElementById('balance').innerText = balance.toLocaleString();
+        // Data Sync
+        db.ref('users/' + userId).on('value', (snap) => {
+            const val = snap.val();
+            if(val) {
+                balance = val.balance || 0;
+                document.getElementById('balance').innerText = Math.floor(balance).toLocaleString();
+                if(val.wallet) document.getElementById('wallet-addr').value = val.wallet;
+                document.getElementById('boost-status').innerText = (val.miningUntil > Date.now()) ? "AUTO: ON" : "AUTO: OFF";
             } else {
-                db.ref('users/' + userId).set({ balance: 0, name: "Player" });
+                db.ref('users/' + userId).set({ balance: 0, name: tg.initDataUnsafe.user?.first_name || "Miner" });
             }
         });
 
-        // ট্যাপ ফাংশন (আগের মতো)
-        document.getElementById('main-coin').addEventListener('touchstart', e => {
-            e.preventDefault();
-            if(energy >= 1) {
-                balance++; energy--;
+        function handleTap(e) {
+            if(energy > 0) {
+                balance += 1; energy -= 1;
+                updateUI(); showAnim(e);
                 db.ref('users/' + userId).update({ balance: balance });
-                updateUI();
+                tg.HapticFeedback.impactOccurred('medium');
             }
-        });
+        }
 
-        // বিজ্ঞাপন ফাংশন
+        function updateUI() {
+            document.getElementById('energy-val').innerText = energy;
+            document.getElementById('energy-bar').style.width = (energy/10) + "%";
+        }
+
+        function showAnim(e) {
+            const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const y = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            const t = document.createElement('div');
+            t.className = 'tap-anim';
+            t.style.left = x + 'px'; t.style.top = y + 'px';
+            t.innerText = '+1'; document.body.appendChild(t);
+            setTimeout(() => t.remove(), 600);
+        }
+
         function showAd() {
-            if (window.Adsgram) {
-                const AdController = window.Adsgram.init({ blockId: "21556" });
-                AdController.show().then(() => {
-                    balance += 5000;
-                    db.ref('users/' + userId).update({ balance: balance });
-                    tg.showAlert("✅ 5,000 TTE Added!");
-                }).catch(() => tg.showAlert("Ad failed to load."));
-            } else {
-                tg.showAlert("Adsgram not loaded yet.");
+            const AdController = window.Adsgram.init({ blockId: "21556" });
+            AdController.show().then(() => {
+                balance += 10000;
+                db.ref('users/' + userId).update({ balance: balance, miningUntil: Date.now() + (6*60*60*1000) });
+                tg.showAlert("Success! +10k TTE & 6H Auto-Mining.");
+            }).catch(() => tg.showAlert("Ad not ready."));
+        }
+
+        function verifyTask(link) {
+            window.open(link, '_blank');
+            setTimeout(() => {
+                balance += 50000;
+                db.ref('users/' + userId).update({ balance: balance });
+                tg.showAlert("Task Verified! +50k TTE.");
+            }, 10000);
+        }
+
+        function saveWallet() {
+            const a = document.getElementById('wallet-addr').value;
+            if(a.length > 5) {
+                db.ref('users/' + userId).update({ wallet: a });
+                tg.showAlert("Wallet Saved!");
             }
         }
 
@@ -127,21 +189,14 @@
             el.classList.add('active');
         }
 
-        function updateUI() {
-            document.getElementById('energy').innerText = energy;
-        }
-
-        function adminTrigger() {
-            adminClicks++;
-            if(adminClicks >= 5) {
-                if(prompt("Pass:") === "7860") document.getElementById('admin-panel').style.display='block';
-                adminClicks = 0;
-            }
-        }
-
-        setInterval(() => { if(energy < 1000) { energy++; updateUI(); } }, 2000);
+        setInterval(() => {
+            if(energy < 1000) { energy += 2; updateUI(); }
+            db.ref('users/' + userId).get().then(s => {
+                if(s.val()?.miningUntil > Date.now()) {
+                    balance += 1; db.ref('users/' + userId).update({ balance: balance });
+                }
+            });
+        }, 1000);
     </script>
 </body>
 </html>
-
-
