@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ELITE ADMIN</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #000; color: #ffcc00; font-family: sans-serif; padding: 30px; }
+        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        h1 { border-bottom: 2px solid #ffcc00; padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>ELITE Master Control</h1>
+    <div class="card">
+        <h3>Live Stats</h3>
+        <p id="total-m">Total Miners: Loading...</p>
+        <p id="total-c">Total TTE Mined: Loading...</p>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
+            authDomain: "tte-game.firebaseapp.com",
+            databaseURL: "https://tte-game-default-rtdb.firebaseio.com",
+            projectId: "tte-game",
+            storageBucket: "tte-game.firebasestorage.app",
+            messagingSenderId: "1067385955645",
+            appId: "1:1067385955645:web:09b237ceaf180459311154"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('users').on('value', (snap) => {
+            const data = snap.val();
+            let count = 0, coins = 0;
+            for(let i in data) { count++; coins += data[i].balance || 0; }
+            document.getElementById('total-m').innerText = "Total Miners: " + count;
+            document.getElementById('total-c').innerText = "Total TTE Mined: " + Math.floor(coins).toLocaleString();
+        });
+    </script>
+</body>
+</html>
