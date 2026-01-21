@@ -1,185 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTE - The Elite Airdrop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TTE - The New Era of Airdrop</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gold: #ffcc00;
+            --secondary-gold: #ff9500;
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --text-color: #ffffff;
+            --accent-blue: #66fcf1;
+        }
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
 
-<style>
-body{margin:0;background:#0b0c10;color:#fff;font-family:Arial}
-.page{display:none;padding:20px}
-.active{display:block}
-button{padding:10px 15px;border:none;border-radius:8px;background:#ffcc00;font-weight:bold}
-.nav{position:fixed;bottom:0;width:100%;display:flex;background:#000}
-.nav div{flex:1;text-align:center;padding:10px;color:#888}
-.nav .on{color:#ffcc00}
-.card{background:#1f2833;margin:10px 0;padding:15px;border-radius:10px}
-</style>
+        /* --- TOP HEADER (Metallic Look) --- */
+        .header {
+            display: flex; justify-content: space-between; padding: 15px;
+            background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .badge { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--primary-gold); }
+
+        /* --- PAGES --- */
+        .page { display: none; height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 150px; }
+        .active-page { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- BALANCE & TAPPING (Your Classic UI) --- */
+        .balance-container { text-align: center; margin: 30px 0; }
+        .balance-container h1 { font-size: 55px; margin: 0; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
+        .token-name { color: var(--primary-gold); font-weight: bold; font-size: 18px; letter-spacing: 2px; }
+
+        .tap-zone { width: 300px; height: 300px; margin: 0 auto; position: relative; display: flex; align-items: center; justify-content: center; }
+        #main-coin {
+            width: 240px; height: 240px;
+            background: radial-gradient(circle, #333 0%, #000 70%);
+            border-radius: 50%; border: 10px solid #1a1a1a;
+            box-shadow: 0 0 40px rgba(0,0,0,1), inset 0 0 20px rgba(255,204,0,0.1);
+            cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center;
+        }
+        #main-coin img { width: 140px; filter: drop-shadow(0 0 10px var(--primary-gold)); }
+        #main-coin:active { transform: scale(0.92); border-color: var(--primary-gold); }
+
+        /* --- NEW FEATURE STYLES (Matching your Gold Theme) --- */
+        .store-card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); }
+        .btn-gold { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; background: var(--primary-gold); color: black; cursor: pointer; }
+        
+        .rank-item { display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.05); margin-bottom: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* --- NAVIGATION --- */
+        .footer-nav {
+            position: fixed; bottom: 0; width: 100%; height: 80px;
+            background: #111; display: flex; justify-content: space-around;
+            align-items: center; border-top: 1px solid #222;
+        }
+        .nav-item { color: #555; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
+        .nav-item i { display: block; font-size: 24px; margin-bottom: 5px; }
+        .nav-item.active { color: var(--primary-gold); text-shadow: 0 0 10px var(--primary-gold); }
+
+        /* --- FLOATING POPUP --- */
+        .pop-up { position: absolute; color: white; font-size: 35px; font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+    </style>
 </head>
-
 <body>
 
-<div id="home" class="page active">
-<h2>💰 Balance</h2>
-<h1 id="bal">0</h1>
+    <div class="header">
+        <div class="badge">Lvl 1 Bronze</div>
+        <div style="color: var(--accent-blue); font-weight: bold;">TTE AIRDROP Q4</div>
+        <div class="badge" style="color:var(--primary-gold)"><i class="fas fa-wallet"></i> Connect</div>
+    </div>
 
-<button id="tap">🔥 TAP</button>
+    <div id="home" class="page active-page">
+        <div class="balance-container">
+            <h1 id="balance">0</h1>
+            <div class="token-name">TTE TOKENS</div>
+        </div>
+        <div class="tap-zone">
+            <div id="main-coin"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
+        </div>
+        <div style="margin-top: 30px; padding: 0 20px;">
+            <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;">
+                <span>⚡ Energy: <span id="energy">1000</span> / 1000</span>
+            </div>
+            <div style="width:100%; height:8px; background:#222; border-radius:10px;"><div id="eng-bar" style="width:100%; height:100%; background:var(--primary-gold); border-radius:10px;"></div></div>
+        </div>
+    </div>
 
-<p>⚡ Energy: <span id="eng">1000</span></p>
+    <div id="leaderboard" class="page">
+        <h2 style="color: var(--primary-gold);"><i class="fas fa-trophy"></i> Top Legends</h2>
+        <div id="leader-list">Loading...</div>
+    </div>
 
-<hr>
+    <div id="friends" class="page">
+        <h2 style="color: var(--primary-gold);"><i class="fas fa-user-friends"></i> Invite Friends</h2>
+        <div class="store-card" style="text-align: center;">
+            <p>Get <b>5,000 TTE</b> for every friend!</p>
+            <button class="btn-gold" onclick="copyRef()">COPY REFERRAL LINK</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <h3>Your Referrals: <span id="ref-count" style="color: var(--primary-gold);">0</span></h3>
+        </div>
+    </div>
 
-<button id="dailyBtn" onclick="claimDaily()">🎁 Daily Reward</button>
-<p>🔥 Streak: <span id="streak">0</span></p>
+    <div id="earn" class="page">
+        <h2 style="color: var(--primary-gold);">Missions</h2>
+        <div class="store-card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div><h3>Join TTE Community</h3><p>+10,000 TTE</p></div>
+            <button class="btn-gold" style="width:80px;" onclick="doTask()">Go</button>
+        </div>
+    </div>
 
-</div>
+    <div class="footer-nav">
+        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-coins"></i>Earn</div>
+        <div class="nav-item" onclick="nav('leaderboard', this)"><i class="fas fa-trophy"></i>Ranks</div>
+        <div class="nav-item" onclick="nav('friends', this)"><i class="fas fa-user-friends"></i>Friends</div>
+        <div class="nav-item" onclick="nav('earn', this)"><i class="fas fa-tasks"></i>Tasks</div>
+    </div>
 
-<div id="leader" class="page">
-<h2>🏆 Leaderboard</h2>
-<div id="leaderboard"></div>
-</div>
+    <script>
+        // --- YOUR REAL FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
+            authDomain: "tte-game.firebaseapp.com",
+            databaseURL: "https://tte-game-default-rtdb.firebaseio.com",
+            projectId: "tte-game",
+            storageBucket: "tte-game.firebasestorage.app",
+            messagingSenderId: "1067385955645",
+            appId: "1:1067385955645:web:09b237ceaf180459311154"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<div id="ref" class="page">
-<h2>👥 Referral</h2>
-<input id="refLink" style="width:100%" readonly>
-<p>Total Referrals: <span id="refCount">0</span></p>
-</div>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "guest_user";
+        const firstName = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Player";
 
-<div class="nav">
-<div class="on" onclick="show('home',this)">Earn</div>
-<div onclick="show('leader',this)">Rank</div>
-<div onclick="show('ref',this)">Refer</div>
-</div>
+        let balance = 0, energy = 1000, refCount = 0;
 
-<script>
-// 🔥 FIREBASE
-firebase.initializeApp({
- apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
- authDomain: "tte-game.firebaseapp.com",
- databaseURL: "https://tte-game-default-rtdb.firebaseio.com",
- projectId: "tte-game"
-});
-const db = firebase.database();
+        // Load & Referral Logic
+        db.ref('users/' + userId).once('value', (snap) => {
+            if(!snap.exists()) {
+                let refBy = tg.initDataUnsafe.start_param;
+                if(refBy && refBy != userId) {
+                    db.ref('users/' + refBy).once('value', (s) => {
+                        if(s.exists()){
+                            db.ref('users/' + refBy).update({
+                                balance: (s.val().balance || 0) + 5000,
+                                refCount: (s.val().refCount || 0) + 1
+                            });
+                        }
+                    });
+                }
+                db.ref('users/' + userId).set({ balance: 0, name: firstName, refCount: 0 });
+            }
+        });
 
-// 🔥 TELEGRAM
-const tg = window.Telegram.WebApp;
-tg.expand();
-const userId = tg.initDataUnsafe?.user?.id || "guest";
+        db.ref('users/' + userId).on('value', (snap) => {
+            if(snap.exists()){
+                balance = snap.val().balance || 0;
+                refCount = snap.val().refCount || 0;
+                updateUI();
+            }
+        });
 
-// 🔥 USER DATA
-let balance=0, energy=1000, tapPower=1;
-let lastTap=0, cheat=0;
-let streak=0, lastClaim="";
+        function nav(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(id).classList.add('active-page');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            if(id === 'leaderboard') loadRanks();
+        }
 
-// 🔥 DB REF
-const userRef = db.ref("users/"+userId);
+        document.getElementById('main-coin').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(energy >= 1) {
+                balance++; energy--;
+                db.ref('users/' + userId).update({ balance: balance });
+                showPop(e.touches[0].pageX, e.touches[0].pageY);
+                updateUI();
+            }
+        });
 
-// 🔥 LOAD USER
-userRef.on("value",s=>{
- if(!s.exists()){
-  userRef.set({
-   balance:0,
-   energy:1000,
-   streak:0,
-   lastClaim:"",
-   referrals:0
-  });
- }else{
-  const d=s.val();
-  balance=d.balance||0;
-  energy=d.energy||1000;
-  streak=d.streak||0;
-  lastClaim=d.lastClaim||"";
-  updateUI();
- }
-});
+        function showPop(x, y) {
+            const el = document.createElement('div'); el.className = 'pop-up';
+            el.innerText = '+1'; el.style.left = x + 'px'; el.style.top = y + 'px';
+            document.body.appendChild(el); setTimeout(() => el.remove(), 700);
+        }
 
-// 🔥 TAP SYSTEM + ANTI BOT
-document.getElementById("tap").onclick=()=>{
- let now=Date.now();
- if(now-lastTap<70){cheat++; if(cheat>10)return;}
- lastTap=now;
+        function loadRanks() {
+            db.ref('users').orderByChild('balance').limitToLast(10).once('value', (snap) => {
+                let html = ''; let i = 1;
+                let players = [];
+                snap.forEach(c => { players.push(c.val()); });
+                players.reverse().forEach(p => {
+                    html += `<div class="rank-item"><span>#${i++} ${p.name}</span><b>${p.balance}</b></div>`;
+                });
+                document.getElementById('leader-list').innerHTML = html;
+            });
+        }
 
- if(energy<=0)return;
+        function copyRef() {
+            const link = `https://t.me/your_bot_username/start?startapp=${userId}`;
+            navigator.clipboard.writeText(link);
+            tg.showAlert("Link Copied! Share it with friends.");
+        }
 
- balance+=tapPower;
- energy--;
+        function doTask() {
+            window.open("https://t.me/airdrop_the", "_blank");
+            tg.showConfirm("Joined?", (ok) => { if(ok) { balance += 10000; db.ref('users/' + userId).update({ balance: balance }); } });
+        }
 
- userRef.update({balance,energy});
- updateUI();
-};
+        setInterval(() => { if(energy < 1000) { energy = Math.min(1000, energy + 2); updateUI(); } }, 1500);
 
-// 🔥 DAILY REWARD
-function claimDaily(){
- let today=new Date().toISOString().slice(0,10);
- if(lastClaim===today)return;
-
- streak++;
- balance+=5000;
-
- userRef.update({
-  balance,
-  streak,
-  lastClaim:today
- });
- alert("Daily Reward Claimed!");
-}
-
-// 🔥 LEADERBOARD
-function loadLeaderboard(){
- db.ref("users").orderByChild("balance").limitToLast(50).once("value",s=>{
-  let arr=[];
-  s.forEach(x=>arr.push(x.val()));
-  arr.reverse();
-  let html="";
-  arr.forEach((u,i)=>{
-   html+=`<div class="card">#${i+1} — ${u.balance||0} TTE</div>`;
-  });
-  document.getElementById("leaderboard").innerHTML=html;
- });
-}
-loadLeaderboard();
-
-// 🔥 REFERRAL
-document.getElementById("refLink").value =
-"https://t.me/YOUR_BOT?start=ref_"+userId;
-
-userRef.child("referrals").on("value",s=>{
- document.getElementById("refCount").innerText=s.val()||0;
-});
-
-// 🔥 UI
-function updateUI(){
- document.getElementById("bal").innerText=Math.floor(balance);
- document.getElementById("eng").innerText=energy;
- document.getElementById("streak").innerText=streak;
-
- let today=new Date().toISOString().slice(0,10);
- if(lastClaim===today){
-  document.getElementById("dailyBtn").disabled=true;
- }
-}
-
-// 🔥 NAV
-function show(id,el){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById(id).classList.add("active");
- document.querySelectorAll(".nav div").forEach(n=>n.classList.remove("on"));
- el.classList.add("on");
- if(id==="leader")loadLeaderboard();
-}
-</script>
-
-<!-- ✅ LEGAL SAFE TEXT -->
-<!--
-TTE is an in-app reward point.
-No guaranteed value or profit.
--->
-
+        function updateUI() {
+            document.getElementById('balance').innerText = balance.toLocaleString();
+            document.getElementById('energy').innerText = energy;
+            document.getElementById('eng-bar').style.width = (energy/10*1) + "%";
+            document.getElementById('ref-count').innerText = refCount;
+        }
+    </script>
 </body>
 </html>
-
