@@ -3,231 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TTE - The New Era of Airdrop</title>
+    <title>TTE - The Elite Airdrop</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root {
-            --primary-gold: #ffcc00;
-            --secondary-gold: #ff9500;
-            --bg-color: #0b0c10;
-            --card-bg: #1f2833;
-            --text-color: #ffffff;
-            --accent-blue: #66fcf1;
-        }
-
-        body {
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        /* --- SPLASH SCREEN --- */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a1a1a, #000);
-            z-index: 10000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-        }
-        .tte-logo { 
-            width: 100px; height: 100px; background: var(--primary-gold); 
-            border-radius: 20px; font-size: 40px; font-weight: bold; color: black;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 50px rgba(255, 204, 0, 0.4);
-        }
-        .load-text { margin-top: 20px; font-size: 14px; letter-spacing: 5px; color: var(--primary-gold); font-weight: bold; }
-
-        /* --- TOP HEADER --- */
-        .header {
-            display: flex; justify-content: space-between; padding: 15px;
-            background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-        .badge { background: #333; padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--primary-gold); cursor: pointer; }
-
-        /* --- ADMIN PANEL MODAL --- */
-        #admin-panel {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 20000; padding: 30px; box-sizing: border-box;
-        }
-        #admin-panel input {
-            width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid var(--primary-gold); color: white; border-radius: 8px;
-        }
-
-        /* --- PAGES --- */
-        .page { display: none; height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; padding-bottom: 150px; }
+        :root { --primary-gold: #ffcc00; --bg: #0b0c10; --card: #1f2833; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; user-select: none; }
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 20000; padding: 25px; box-sizing: border-box; }
+        .admin-input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid var(--primary-gold); color: white; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.05); border-bottom: 1px solid #222; }
+        .badge { background: #333; padding: 6px 12px; border-radius: 20px; font-size: 11px; border: 1px solid var(--primary-gold); cursor: pointer; }
+        .page { display: none; height: 85vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 150px; }
         .active-page { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- BALANCE & TAPPING --- */
-        .balance-container { text-align: center; margin: 30px 0; }
-        .balance-container h1 { font-size: 55px; margin: 0; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
-        .token-name { color: var(--primary-gold); font-weight: bold; font-size: 18px; letter-spacing: 2px; }
-
-        .tap-zone {
-            width: 300px; height: 300px; margin: 0 auto; position: relative;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #main-coin {
-            width: 240px; height: 240px;
-            background: radial-gradient(circle, #333 0%, #000 70%);
-            border-radius: 50%; border: 10px solid #1a1a1a;
-            box-shadow: 0 0 40px rgba(0,0,0,1), inset 0 0 20px rgba(255,204,0,0.1);
-            cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center;
-        }
-        #main-coin img { width: 140px; filter: drop-shadow(0 0 10px var(--primary-gold)); }
-        #main-coin:active { transform: scale(0.92); border-color: var(--primary-gold); }
-
-        /* --- CARDS & BUTTONS --- */
-        .store-card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); }
-        .boost-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        .footer-nav {
-            position: fixed; bottom: 0; width: 100%; height: 80px;
-            background: #111; display: flex; justify-content: space-around;
-            align-items: center; border-top: 1px solid #222;
-        }
-        .nav-item { color: #555; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
-        .nav-item.active { color: var(--primary-gold); }
-
-        .pop-up { position: absolute; color: white; font-size: 35px; font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .balance-sec { text-align: center; margin: 25px 0; }
+        .balance-sec h1 { font-size: 50px; margin: 0; font-weight: 900; background: linear-gradient(to bottom, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #tap-hero { width: 250px; height: 250px; background: radial-gradient(circle, #333 0%, #000 70%); border-radius: 50%; border: 8px solid #1a1a1a; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 0 50px rgba(0,0,0,0.8); cursor: pointer; transition: 0.1s; }
+        #tap-hero:active { transform: scale(0.93); border-color: var(--primary-gold); }
+        #tap-hero img { width: 150px; filter: drop-shadow(0 0 10px var(--primary-gold)); }
+        .store-card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary-gold); display: flex; justify-content: space-between; align-items: center; }
+        .btn-action { background: var(--primary-gold); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
+        .nav-btn { color: #666; font-size: 11px; text-align: center; flex: 1; cursor: pointer; }
+        .nav-btn.active { color: var(--primary-gold); }
+        .pop-up { position: absolute; color: white; font-size: 32px; font-weight: bold; animation: popUp 0.7s forwards; pointer-events: none; }
+        @keyframes popUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <div class="tte-logo">TTE</div>
-        <div class="load-text">CONNECTING...</div>
+        <div style="width: 80px; height: 80px; background: var(--primary-gold); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: #000;">TTE</div>
+        <p style="color: var(--primary-gold); margin-top: 15px; font-size: 12px; letter-spacing: 3px;">DATABASE CONNECTED</p>
     </div>
 
     <div id="admin-panel">
         <h2 style="color:var(--primary-gold)">Admin Command Center</h2>
-        <p>Edit Channel Link:</p>
-        <input type="text" id="admin-link-input" value="https://t.me/airdrop_the">
-        <p>Task Reward Amount:</p>
-        <input type="number" id="admin-reward-input" value="10000">
-        <p>Set My Balance:</p>
-        <input type="number" id="admin-balance-input">
-        <button class="boost-btn" style="background:var(--primary-gold)" onclick="saveAdminChanges()">SAVE CHANGES</button>
+        <label>Update Channel Link:</label>
+        <input type="text" id="adm-link" class="admin-input" value="https://t.me/airdrop_the">
+        <label>Reward Point:</label>
+        <input type="number" id="adm-reward" class="admin-input" value="10000">
+        <button class="btn-action" style="width:100%; margin-top:20px;" onclick="saveAdmin()">SAVE SETTINGS</button>
         <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:none; color:white; border:none; width:100%; margin-top:15px;">Close Panel</button>
     </div>
 
     <div class="header">
-        <div class="badge" onclick="adminClick()">Lvl 1 Bronze</div>
-        <div style="color: var(--accent-blue); font-weight: bold;">TTE AIRDROP</div>
-        <div class="badge" style="color:var(--primary-gold)"><i class="fas fa-wallet"></i> Connect</div>
+        <div class="badge" onclick="triggerAdmin()">Lvl 1 Bronze</div>
+        <div style="color: var(--primary-gold); font-weight: bold;">TTE AIRDROP</div>
+        <div class="badge" onclick="alert('Wallet Coming Soon!')"><i class="fas fa-wallet"></i> Connect</div>
     </div>
 
     <div id="home" class="page active-page">
-        <div class="balance-container">
-            <h1 id="balance">0</h1>
-            <div class="token-name">TTE TOKENS</div>
+        <div class="balance-sec"><h1 id="bal">0</h1><div style="color:var(--primary-gold); font-weight:bold; letter-spacing:2px;">TTE TOKENS</div></div>
+        <div id="tap-hero"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
+        <div style="padding: 20px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span>⚡ Energy: <span id="eng">1000</span>/1000</span><span id="pwr-txt">Power: +1</span></div>
+            <div style="width:100%; height:6px; background:#222; border-radius:10px;"><div id="eng-bar" style="width:100%; height:100%; background:var(--primary-gold); border-radius:10px;"></div></div>
         </div>
-        <div class="tap-zone">
-            <div id="main-coin"><img src="https://cdn-icons-png.flaticon.com/512/8727/8727924.png"></div>
-        </div>
-        <div style="margin-top: 30px; padding: 0 20px;">
-            <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;">
-                <span>⚡ Energy: <span id="energy">1000</span></span>
-                <span id="tap-power-txt">Power: +1</span>
-            </div>
-            <div style="width:100%; height:8px; background:#222; border-radius:10px;"><div id="eng-bar" style="width:100%; height:100%; background:var(--primary-gold); border-radius:10px;"></div></div>
-        </div>
+    </div>
+
+    <div id="boost" class="page">
+        <h2 style="color:var(--primary-gold)">Boost Store</h2>
+        <div class="store-card"><div><h3>Video Ad Boost</h3><p style="margin:0; font-size:12px; color:#888;">Watch to get +5,000 TTE</p></div><button class="btn-action" onclick="boostAd()">WATCH</button></div>
+        <div class="store-card"><div><h3>Star Boost</h3><p style="margin:0; font-size:12px; color:#888;">Double Tap Power</p></div><button class="btn-action" onclick="boostStar()">START</button></div>
     </div>
 
     <div id="earn" class="page">
-        <h2 style="color: var(--primary-gold);">Missions</h2>
-        <div class="store-card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div><h3>Join Airdrop The</h3><p id="reward-text">+10,000 TTE</p></div>
-            <button class="boost-btn" style="width:80px; background:white; color:black;" onclick="doChannelTask()">Go</button>
-        </div>
+        <h2 style="color:var(--primary-gold)">Missions</h2>
+        <div class="store-card"><div><h3 id="task-name">Join Airdrop The</h3><p id="task-reward-text" style="margin:0; color:#888;">+10,000 TTE</p></div><button class="btn-action" onclick="runTask()">GO</button></div>
     </div>
 
-    <div id="boost" class="page"><h2>Boost Store coming soon...</h2></div>
-
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-coins"></i>Earn</div>
-        <div class="nav-item" onclick="nav('earn', this)"><i class="fas fa-tasks"></i>Tasks</div>
-        <div class="nav-item" onclick="alert('Wallet connection coming soon')"><i class="fas fa-wallet"></i>Wallet</div>
+    <div class="nav-bar">
+        <div class="nav-btn active" onclick="showPage('home', this)"><i class="fas fa-coins"></i><br>Earn</div>
+        <div class="nav-btn" onclick="showPage('boost', this)"><i class="fas fa-bolt"></i><br>Boost</div>
+        <div class="nav-btn" onclick="showPage('earn', this)"><i class="fas fa-tasks"></i><br>Tasks</div>
     </div>
 
     <script>
-        let balance = 0, energy = 1000, tapPower = 1;
-        let adminSettings = { link: "https://t.me/airdrop_the", reward: 10000 };
-        let clickCount = 0;
+        // --- YOUR FIREBASE CONFIG (SCREENSHOT THEKE NEWA) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
+            authDomain: "tte-game.firebaseapp.com",
+            databaseURL: "https://tte-game-default-rtdb.firebaseio.com",
+            projectId: "tte-game",
+            storageBucket: "tte-game.firebasestorage.app",
+            messagingSenderId: "1067385955645",
+            appId: "1:1067385955645:web:09b237ceaf180459311154"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        let balance = 0, energy = 1000, tapPower = 1, adminClicks = 0;
+        let adminData = { link: "https://t.me/airdrop_the", reward: 10000 };
+        const tg = window.Telegram.WebApp; tg.expand();
+        let userId = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : "guest_user";
 
-        setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 2000);
+        // Load Data from Database
+        db.ref('users/' + userId).on('value', (snap) => {
+            if(snap.exists()) { balance = snap.val().balance || 0; updateUI(); }
+        });
 
-        function adminClick() {
-            clickCount++;
-            if(clickCount >= 5) {
-                let pass = prompt("Enter Admin Password:");
-                if(pass === "7860") {
-                    document.getElementById('admin-panel').style.display = 'block';
-                }
-                clickCount = 0;
-            }
-        }
+        setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 2000);
 
-        function saveAdminChanges() {
-            adminSettings.link = document.getElementById('admin-link-input').value;
-            adminSettings.reward = parseInt(document.getElementById('admin-reward-input').value);
-            let newBal = document.getElementById('admin-balance-input').value;
-            if(newBal) balance = parseInt(newBal);
-            
-            document.getElementById('reward-text').innerText = "+" + adminSettings.reward.toLocaleString() + " TTE";
-            updateUI();
-            alert("Settings Updated!");
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        function doChannelTask() {
-            window.open(adminSettings.link, '_blank');
-            tg.showConfirm("Did you join the channel?", (ok) => {
-                if(ok) {
-                    balance += adminSettings.reward;
-                    updateUI();
-                    tg.showAlert("Reward Collected!");
-                }
-            });
-        }
-
-        function nav(id, el) {
+        function showPage(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById(id).classList.add('active-page');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
         }
 
-        document.getElementById('main-coin').addEventListener('touchstart', (e) => {
+        document.getElementById('tap-hero').addEventListener('touchstart', (e) => {
             e.preventDefault();
             if(energy >= tapPower) {
                 balance += tapPower; energy -= tapPower;
-                showPop(e.touches[0].pageX, e.touches[0].pageY);
-                updateUI();
+                db.ref('users/' + userId).update({ balance: balance });
+                createPop(e.touches[0].pageX, e.touches[0].pageY); updateUI();
             }
         });
 
-        function showPop(x, y) {
-            const el = document.createElement('div'); el.className = 'pop-up';
-            el.innerText = `+${tapPower}`; el.style.left = x + 'px'; el.style.top = y + 'px';
-            document.body.appendChild(el); setTimeout(() => el.remove(), 700);
+        function createPop(x, y) {
+            const d = document.createElement('div'); d.className='pop-up'; d.innerText=`+${tapPower}`;
+            d.style.left=x+'px'; d.style.top=y+'px'; document.body.appendChild(d);
+            setTimeout(()=>d.remove(), 700);
         }
 
-        setInterval(() => { if(energy < 1000) { energy = Math.min(1000, energy + 2); updateUI(); } }, 1500);
+        function triggerAdmin() {
+            adminClicks++;
+            if(adminClicks >= 5) {
+                if(prompt("Admin Password:") === "7860") document.getElementById('admin-panel').style.display='block';
+                adminClicks = 0;
+            }
+        }
 
+        function saveAdmin() {
+            adminData.link = document.getElementById('adm-link').value;
+            adminData.reward = parseInt(document.getElementById('adm-reward').value);
+            document.getElementById('task-reward-text').innerText = "+" + adminData.reward.toLocaleString() + " TTE";
+            alert("Settings Saved!"); document.getElementById('admin-panel').style.display='none';
+        }
+
+        function runTask() {
+            window.open(adminData.link, '_blank');
+            tg.showConfirm("Did you join?", (ok) => { if(ok) { balance += adminData.reward; db.ref('users/' + userId).update({ balance: balance }); updateUI(); } });
+        }
+
+        function boostAd() { 
+            tg.showConfirm("Watch Ad for 5,000 TTE?", (ok) => { if(ok) { balance += 5000; db.ref('users/' + userId).update({ balance: balance }); updateUI(); } });
+        }
+
+        function boostStar() {
+            tg.showConfirm("Spend Stars to Double Power?", (ok) => { if(ok) { tapPower = 2; updateUI(); alert("Power Doubled!"); } });
+        }
+
+        setInterval(() => { if(energy < 1000) { energy = Math.min(1000, energy+2); updateUI(); } }, 1500);
         function updateUI() {
-            document.getElementById('balance').innerText = Math.floor(balance).toLocaleString();
-            document.getElementById('energy').innerText = energy;
-            document.getElementById('eng-bar').style.width = (energy/1000*100) + "%";
-            document.getElementById('tap-power-txt').innerText = `Power: +${tapPower}`;
+            document.getElementById('bal').innerText = Math.floor(balance).toLocaleString();
+            document.getElementById('eng').innerText = energy;
+            document.getElementById('eng-bar').style.width = (energy/1000*100)+'%';
+            document.getElementById('pwr-txt').innerText = `Power: +${tapPower}`;
         }
     </script>
 </body>
