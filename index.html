@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TTE ELITE - THE MASTER PROJECT 2026</title>
+    <title>TTE ELITE - ULTIMATE EDITION</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10499994' data-sdk='show_10499994'></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -17,189 +17,178 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
         body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* HEADER & STATS */
-        .header { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 12px; background: rgba(0,0,0,0.6); border-bottom: 1px solid #1e293b; }
+        /* HEADER */
+        .header { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 10px; background: #000; border-bottom: 1px solid #1e293b; }
         .stat-card { background: var(--glass); padding: 8px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .stat-card small { font-size: 8px; color: #aaa; display: block; text-transform: uppercase; }
+        .stat-card small { font-size: 8px; color: #888; display: block; }
         .stat-card b { font-size: 11px; color: var(--gold); font-family: 'Orbitron'; }
 
-        .banner { background: linear-gradient(90deg, #1e1b4b, #4c1d95); margin: 8px 15px; padding: 10px; border-radius: 15px; border: 1px solid var(--elite); text-align: center; font-family: 'Orbitron'; font-size: 12px; box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+        /* SCREENS */
+        .app-screen { height: calc(100vh - 160px); overflow-y: auto; padding: 20px; display: none; padding-bottom: 80px; }
+        .active-scr { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* NAVIGATION SCREENS */
-        .app-screen { height: calc(100vh - 170px); overflow-y: auto; padding: 20px; display: none; padding-bottom: 100px; }
-        .active-scr { display: block; animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* MAIN MINE UI */
+        /* MINE SECTION */
         .balance-area { text-align: center; margin-bottom: 10px; }
-        .balance-area h1 { font-family: 'Orbitron'; font-size: 40px; margin: 0; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        .rank-badge { display: inline-block; background: var(--gold); color: #000; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: 900; margin-top: 5px; }
+        .balance-area h1 { font-family: 'Orbitron'; font-size: 40px; margin: 0; color: #fff; }
+        
+        .coin-wrap { display: flex; justify-content: center; align-items: center; height: 220px; position: relative; }
+        .main-coin { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd700, #b8860b); border: 8px solid #5c4000; box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.1s; }
+        .main-coin:active { transform: scale(0.95); }
+        .main-coin span { font-family: 'Orbitron'; font-size: 45px; font-weight: 900; color: #5c4000; }
 
-        .coin-wrap { display: flex; justify-content: center; align-items: center; height: 230px; position: relative; }
-        .main-coin { width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd700, #b8860b); border: 10px solid #5c4000; box-shadow: 0 0 40px rgba(255, 204, 0, 0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.05s; }
-        .main-coin:active { transform: scale(0.92); }
-        .main-coin span { font-family: 'Orbitron'; font-size: 50px; font-weight: 900; color: #5c4000; }
+        .mine-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .tool-btn { background: var(--glass); padding: 12px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); font-size: 12px; font-weight: 700; cursor: pointer; }
+        .tool-btn i { display: block; font-size: 20px; margin-bottom: 5px; color: var(--accent); }
 
-        /* LISTS & CARDS */
-        .item-card { background: var(--glass); border-radius: 18px; padding: 15px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        /* CARDS & TASKS */
+        .item-card { background: var(--glass); border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .item-info b { display: block; font-size: 14px; color: var(--gold); }
-        .item-info span { font-size: 10px; color: #ccc; }
-        .action-btn { background: var(--accent); color: #000; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 11px; cursor: pointer; }
+        .item-info span { font-size: 10px; color: #aaa; }
+        .action-btn { background: var(--accent); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; }
 
-        /* BOTTOM NAV */
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0d1117; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1e293b; z-index: 1000; }
-        .nav-item { text-align: center; color: #475569; font-size: 10px; font-weight: 600; }
+        /* WALLET */
+        .wallet-card { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 20px; padding: 20px; text-align: center; border: 1px solid var(--elite); margin-bottom: 20px; }
+        .token-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* NAVBAR */
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1e293b; }
+        .nav-item { text-align: center; color: #475569; font-size: 10px; font-weight: 600; cursor: pointer; }
         .nav-item.active-nav { color: var(--gold); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
 
         .tap-pop { position: absolute; color: white; font-weight: 900; font-family: 'Orbitron'; pointer-events: none; animation: popUp 0.6s ease-out forwards; }
         @keyframes popUp { to { opacity: 0; transform: translateY(-100px); } }
+
+        /* SPIN MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .spin-box { width: 300px; text-align: center; }
+        #wheel { width: 250px; height: 250px; border: 5px solid #fff; border-radius: 50%; transition: 4s cubic-bezier(0.1, 0, 0.1, 1); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="stat-card"><small>Tapping</small><b id="tap-val">+1</b></div>
+        <div class="stat-card"><small>Per Tap</small><b id="tap-val">+1</b></div>
         <div class="stat-card"><small>P.P.H</small><b id="pph-val" style="color:var(--accent)">0</b></div>
-        <div class="stat-card"><small>Daily Combo</small><b id="combo-stat">0/3</b></div>
+        <div class="stat-card"><small>Boost</small><b id="boost-status">OFF</b></div>
     </div>
-
-    <div class="banner">🚀 AIRDROP AUG 25: <span id="timer">00d 00h 00m</span></div>
 
     <div id="scr-mine" class="app-screen active-scr">
         <div class="balance-area">
-            <div class="rank-badge" id="user-rank">BRONZE</div>
-            <h1 id="bal-main">0</h1>
-            <div style="color:var(--accent); font-weight:700; font-size:14px;">💎 <span id="elite-main">0.00</span> ELITE</div>
+            <h1 id="bal-mine">0</h1>
+            <small style="color:var(--gold)">TTE TOKENS</small>
         </div>
 
         <div class="coin-wrap">
-            <div class="main-coin" id="coin-btn" onclick="handleTap(event)"><span>TTE</span></div>
+            <div class="main-coin" onclick="handleTap(event)"><span>TTE</span></div>
         </div>
 
-        <div style="margin-top:10px;">
+        <div class="mine-tools">
+            <div class="tool-btn" onclick="startAd('turbo')"><i class="fas fa-rocket"></i>TURBO ADS</div>
+            <div class="tool-btn" onclick="openSpin()"><i class="fas fa-dharmachakra"></i>SPIN WHEEL</div>
+        </div>
+
+        <div style="margin-top:20px;">
             <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;">
                 <span>⚡ Energy: <span id="en-txt">1000/1000</span></span>
-                <span onclick="startAd('boost')" style="color:var(--gold); font-weight:700;"><i class="fas fa-bolt"></i> FREE BOOST</span>
             </div>
             <div style="height:8px; background:#111; border-radius:10px; overflow:hidden;"><div id="en-fill" style="width:100%; height:100%; background:var(--gold);"></div></div>
         </div>
     </div>
 
-    <div id="scr-up" class="app-screen">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-family:'Orbitron'; color:var(--gold)">UPGRADES</h2>
-            <button class="action-btn" onclick="claimDaily()">DAILY REWARD</button>
-        </div>
-        <div id="cards-list">
-            <div class="item-card">
-                <div class="item-info"><b>CPU Miner</b><span>+150 PPH | Cost: 5,000</span></div>
-                <button class="action-btn" onclick="buyCard(5000, 150, 'CPU Miner')">BUY</button>
+    <div id="scr-task" class="app-screen">
+        <h2 style="font-family:'Orbitron'; color:var(--gold)">TASKS</h2>
+        <div id="task-list">
             </div>
-            <div class="item-card">
-                <div class="item-info"><b>GPU Studio</b><span>+600 PPH | Cost: 25,000</span></div>
-                <button class="action-btn" onclick="buyCard(25000, 600, 'GPU Studio')">BUY</button>
-            </div>
-            <div class="item-card">
-                <div class="item-info"><b>Elite Server</b><span>+2500 PPH | Cost: 100,000</span></div>
-                <button class="action-btn" onclick="buyCard(100000, 2500, 'Elite Server')">BUY</button>
-            </div>
-        </div>
     </div>
 
-    <div id="scr-ref" class="app-screen">
-        <h2 style="font-family:'Orbitron'; color:var(--gold)">ALLIANCE</h2>
-        <div class="item-card" style="display:block;">
-            <p style="margin:0 0 10px 0; font-size:12px;">Redeem Leader Gift Code</p>
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="gift-code" placeholder="ENTER CODE" style="flex:1; background:#000; border:1px solid #333; color:#fff; padding:12px; border-radius:10px;">
-                <button onclick="claimGift()" class="action-btn">CLAIM</button>
-            </div>
+    <div id="scr-up" class="app-screen">
+        <h2 style="font-family:'Orbitron'; color:var(--gold)">UPGRADES</h2>
+        <div class="item-card">
+            <div class="item-info"><b>Mining Rig v1</b><span>+500 PPH | Cost: 10K</span></div>
+            <button class="action-btn" onclick="buyCard(10000, 500)">BUY</button>
         </div>
-        <div class="item-card" style="display:block; text-align:center;">
-            <p style="font-size:12px;">Your Referral Link (2-Tier Commission)</p>
-            <input type="text" id="ref-link" readonly style="width:100%; background:transparent; border:none; color:var(--accent); text-align:center; padding:10px 0; font-size:12px;">
-            <button onclick="copyRef()" class="action-btn" style="width:100%;">INVITE FRIENDS</button>
+        <div class="item-card">
+            <div class="item-info"><b>Elite Server</b><span>+2000 PPH | Cost: 50K</span></div>
+            <button class="action-btn" onclick="buyCard(50000, 2000)">BUY</button>
         </div>
     </div>
 
     <div id="scr-wallet" class="app-screen">
         <h2 style="font-family:'Orbitron'; color:var(--gold)">WALLET</h2>
-        <div class="item-card" style="display:block; text-align:center; border:2px solid var(--elite);">
-            <p>ELITE ASSETS</p>
-            <h1 id="w-elite" style="color:var(--elite); font-size:35px;">0.00</h1>
-            <button onclick="swap()" class="action-btn" style="width:100%; background:var(--elite); color:#fff;">SWAP 10M TTE → 0.1 ELITE</button>
+        <div class="wallet-card">
+            <div class="token-row"><span>TTE Balance:</span><b id="w-tte">0</b></div>
+            <div class="token-row"><span>ELITE Balance:</span><b id="w-elite" style="color:var(--elite)">0.00</b></div>
+            <button onclick="swap()" class="action-btn" style="width:100%; margin-top:15px; background:var(--elite); color:#fff;">SWAP 10M TTE → 0.1 ELITE</button>
         </div>
+        
         <div class="item-card" style="display:block;">
             <p style="font-size:12px;">TON Wallet Address</p>
-            <input type="text" id="ton-addr" placeholder="UQ..." style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:15px; border-radius:12px; margin-top:10px;">
+            <input type="text" id="ton-addr" placeholder="UQ..." style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:12px; border-radius:10px;">
             <button onclick="saveW()" class="action-btn" style="width:100%; margin-top:10px;">SAVE ADDRESS</button>
         </div>
     </div>
 
     <div id="scr-admin" class="app-screen">
-        <h2 style="font-family:'Orbitron';">ADMIN PANEL</h2>
+        <h2 style="font-family:'Orbitron';">ADMIN CONTROL</h2>
         <div class="item-card" style="display:block;">
-            <input type="text" id="ad-g-c" placeholder="GIFT CODE" style="width:100%; margin-bottom:5px; padding:10px;">
-            <input type="number" id="ad-g-r" placeholder="REWARD" style="width:100%; margin-bottom:10px; padding:10px;">
-            <button onclick="adminAddGift()" class="action-btn" style="width:100%;">CREATE CODE</button>
+            <p>Add Task</p>
+            <input type="text" id="ad-task-n" placeholder="Task Name" style="width:100%; margin-bottom:5px;">
+            <input type="text" id="ad-task-l" placeholder="Link" style="width:100%; margin-bottom:5px;">
+            <input type="number" id="ad-task-r" placeholder="Reward" style="width:100%; margin-bottom:10px;">
+            <button onclick="adminAddTask()" class="action-btn" style="width:100%;">ADD TASK</button>
+        </div>
+        <div class="item-card" style="display:block;">
+            <p>User Edit (ID based)</p>
+            <input type="text" id="ad-u-id" placeholder="User ID" style="width:100%; margin-bottom:5px;">
+            <input type="number" id="ad-u-bal" placeholder="Add TTE" style="width:100%; margin-bottom:10px;">
+            <button onclick="adminAddBal()" class="action-btn" style="width:100%;">UPDATE USER</button>
+        </div>
+    </div>
+
+    <div id="spin-modal" class="modal">
+        <div class="spin-box">
+            <h2 style="font-family:'Orbitron'; color:var(--gold)">LUCKY SPIN</h2>
+            <img id="wheel" src="https://i.ibb.co/9H66P7v/wheel.png" alt="wheel">
+            <button onclick="spinNow()" class="action-btn" style="width:100%; margin-top:20px; padding:15px;">SPIN NOW (1 SPIN)</button>
+            <button onclick="startAd('spin')" class="action-btn" style="width:100%; margin-top:10px; background:var(--gold);">AD FOR SPIN</button>
+            <p onclick="closeSpin()" style="margin-top:15px; color:#888; cursor:pointer;">Close</p>
         </div>
     </div>
 
     <nav class="navbar">
         <div class="nav-item active-nav" onclick="nav('scr-mine', this)"><i class="fas fa-hammer"></i>Mine</div>
+        <div class="nav-item" onclick="nav('scr-task', this)"><i class="fas fa-tasks"></i>Tasks</div>
         <div class="nav-item" onclick="nav('scr-up', this)"><i class="fas fa-rocket"></i>Upgrade</div>
-        <div class="nav-item" onclick="nav('scr-ref', this)"><i class="fas fa-users"></i>Alliance</div>
         <div class="nav-item" onclick="nav('scr-wallet', this)"><i class="fas fa-wallet"></i>Wallet</div>
     </nav>
 
     <script>
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = { apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU", authDomain: "tte-game.firebaseapp.com", databaseURL: "https://tte-game-default-rtdb.firebaseio.com", projectId: "tte-game", storageBucket: "tte-game.firebasestorage.app", messagingSenderId: "1067385955645", appId: "1:1067385955645:web:09b237ceaf180459311154" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database(), tg = window.Telegram.WebApp;
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "tester_99";
-        const refBy = new URLSearchParams(window.location.search).get('start');
+        const ADMIN_ID = "7178946316";
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "dev_test";
 
-        // --- GAME DATA ---
-        let u = { bal: 0, elite: 0, energy: 1000, pph: 0, lastActive: Date.now(), wallet: "", bUntil: 0, streak: 0, combo: [], ref: refBy || "" };
-        const comboToday = ["CPU Miner", "GPU Studio", "Elite Server"]; // Change daily
+        let u = { bal: 0, elite: 0, energy: 1000, pph: 0, lastActive: Date.now(), wallet: "", bUntil: 0, spins: 0 };
 
         db.ref('users/' + userId).on('value', s => {
-            if(s.val()) { 
-                u = {...u, ...s.val()}; 
-                calculatePassive();
-                updateUI(); 
-            } else { 
-                // Dogs style Age Bonus
-                let ageBonus = Math.floor(Math.random() * 30000) + 5000;
-                u.bal = ageBonus;
-                db.ref('users/'+userId).set(u);
-                if(refBy) {
-                    db.ref('users/'+refBy+'/bal').transaction(b => (b||0) + 15000); // Level 1 ref
-                    db.ref('users/'+refBy+'/ref').once('value', s2 => {
-                        if(s2.val()) db.ref('users/'+s2.val()+'/bal').transaction(b => (b||0) + 5000); // Level 2 ref
-                    });
-                }
-                tg.showAlert(`Welcome! You received ${ageBonus} TTE Age Bonus!`);
-            }
+            if(s.val()) { u = {...u, ...s.val()}; calculatePassive(); updateUI(); }
+            else { db.ref('users/'+userId).set(u); }
         });
 
         function calculatePassive() {
             const now = Date.now();
             const earned = (u.pph / 3600) * Math.floor((now - u.lastActive) / 1000);
-            if(earned >= 1) {
-                u.bal += earned; u.lastActive = now;
-                db.ref('users/'+userId).update({bal: u.bal, lastActive: now});
-                tg.showAlert(`While you were away: +${Math.floor(earned)} TTE`);
-            }
+            if(earned >= 1) { u.bal += earned; u.lastActive = now; db.ref('users/'+userId).update({bal: u.bal, lastActive: now}); }
         }
 
         function handleTap(e) {
-            let mult = (Date.now() < u.bUntil) ? 2 : 1;
-            if(u.energy >= mult) {
-                u.bal += mult; u.energy -= mult;
-                showPop(e, mult);
+            let p = (Date.now() < u.bUntil) ? 5 : 1; // Turbo gives 5x
+            if(u.energy >= 1) {
+                u.bal += p; u.energy -= 1;
+                showPop(e, p);
                 db.ref('users/'+userId).update({bal: u.bal, energy: u.energy, lastActive: Date.now()});
                 updateUI();
                 tg.HapticFeedback.impactOccurred('light');
@@ -213,63 +202,51 @@
             document.body.appendChild(p); setTimeout(()=>p.remove(), 600);
         }
 
-        function buyCard(cost, pphAdd, name) {
-            if(u.bal >= cost) {
-                u.bal -= cost; u.pph += pphAdd;
-                if(!u.combo) u.combo = [];
-                if(!u.combo.includes(name)) u.combo.push(name);
-                
-                // Check Combo
-                if(u.combo.length === 3) {
-                    if(u.combo.every(val => comboToday.includes(val))) {
-                        u.bal += 1000000; tg.showAlert("DAILY COMBO SOLVED! +1M TTE");
-                    }
-                    u.combo = [];
-                }
-                db.ref('users/'+userId).update({bal: u.bal, pph: u.pph, combo: u.combo});
-            } else tg.showAlert("Insufficient TTE!");
-        }
-
-        function claimDaily() {
-            const today = new Date().toDateString();
-            if(u.lastClaim === today) return tg.showAlert("Already claimed today!");
-            u.streak++; let r = u.streak * 10000; u.bal += r; u.lastClaim = today;
-            db.ref('users/'+userId).update({bal: u.bal, streak: u.streak, lastClaim: today});
-            tg.showAlert(`Day ${u.streak} Claimed: +${r} TTE`);
-        }
-
         function updateUI() {
-            document.getElementById('bal-main').innerText = Math.floor(u.bal).toLocaleString();
-            document.getElementById('pph-val').innerText = u.pph.toLocaleString();
-            document.getElementById('elite-main').innerText = u.elite.toFixed(2);
+            document.getElementById('bal-mine').innerText = Math.floor(u.bal).toLocaleString();
+            document.getElementById('w-tte').innerText = Math.floor(u.bal).toLocaleString();
             document.getElementById('w-elite').innerText = u.elite.toFixed(2);
+            document.getElementById('pph-val').innerText = u.pph;
             document.getElementById('en-txt').innerText = u.energy + "/1000";
             document.getElementById('en-fill').style.width = (u.energy/10) + "%";
-            document.getElementById('combo-stat').innerText = (u.combo ? u.combo.length : 0) + "/3";
-            document.getElementById('ref-link').value = "https://t.me/taptoearn_tte_bot?start=" + userId;
-            
-            // Rank System
-            let rank = "BRONZE";
-            if(u.bal > 100000) rank = "SILVER";
-            if(u.bal > 1000000) rank = "GOLD";
-            if(u.bal > 10000000) rank = "ELITE";
-            document.getElementById('user-rank').innerText = rank;
+            document.getElementById('boost-status').innerText = (Date.now() < u.bUntil) ? "TURBO" : "OFF";
         }
 
-        function startAd(t) {
+        function startAd(type) {
             show_10499994().then(() => {
-                u.bUntil = Date.now() + (2 * 60 * 60 * 1000); // 2 hours boost
-                db.ref('users/'+userId).update({bUntil: u.bUntil});
-                tg.showAlert("2X Boost Active for 2 Hours!");
+                if(type === 'turbo') u.bUntil = Date.now() + (10 * 60 * 1000); // 10 mins turbo
+                if(type === 'spin') u.spins += 1;
+                db.ref('users/'+userId).update({bUntil: u.bUntil, spins: u.spins});
+                tg.showAlert("Reward Claimed!");
             });
         }
 
-        setInterval(() => {
-            const diff = new Date("August 25, 2026").getTime() - Date.now();
-            const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000);
-            document.getElementById('timer').innerText = `${d}d ${h}h ${m}m`;
-            if(u.energy < 1000) { u.energy++; updateUI(); }
-        }, 1000);
+        function openSpin() { document.getElementById('spin-modal').style.display='flex'; }
+        function closeSpin() { document.getElementById('spin-modal').style.display='none'; }
+        function spinNow() {
+            if(u.spins < 1) return tg.showAlert("Watch Ad to get Spin!");
+            u.spins--;
+            const deg = 3600 + Math.random() * 360;
+            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
+            setTimeout(() => {
+                const win = 50000; u.bal += win; // Simplification: Win 50k TTE
+                db.ref('users/'+userId).update({bal: u.bal, spins: u.spins});
+                tg.showAlert("You won 50,000 TTE!");
+            }, 4000);
+        }
+
+        function swap() {
+            if(u.bal >= 10000000) {
+                u.bal -= 10000000; u.elite += 0.1;
+                db.ref('users/'+userId).update({bal: u.bal, elite: u.elite});
+                tg.showAlert("Swap Success! 0.1 ELITE added.");
+            } else tg.showAlert("Need 10M TTE!");
+        }
+
+        function buyCard(c, p) {
+            if(u.bal >= c) { u.bal -= c; u.pph += p; db.ref('users/'+userId).update({bal: u.bal, pph: u.pph}); }
+            else tg.showAlert("Insufficient TTE!");
+        }
 
         function nav(id, el) {
             document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-scr'));
@@ -278,29 +255,33 @@
             el.classList.add('active-nav');
         }
 
-        function claimGift() {
-            const c = document.getElementById('gift-code').value;
-            db.ref('gift_codes/'+c).once('value', s => {
-                if(s.val()) { 
-                    u.bal += s.val().r; db.ref('users/'+userId).update({bal: u.bal});
-                    tg.showAlert("Gift Claimed!"); document.getElementById('gift-code').value="";
-                } else tg.showAlert("Invalid Code");
-            });
-        }
-        function saveW() { u.wallet = document.getElementById('ton-addr').value; db.ref('users/'+userId).update({wallet: u.wallet}); tg.showAlert("Saved!"); }
-        function swap() { if(u.bal >= 10000000) { u.bal -= 10000000; u.elite += 0.1; db.ref('users/'+userId).update({bal: u.bal, elite: u.elite}); } }
-        function copyRef() { document.getElementById('ref-link').select(); document.execCommand('copy'); tg.showAlert("Link Copied!"); }
-        
-        // Admin
-        if(userId === "7178946316") {
+        function saveW() { u.wallet = document.getElementById('ton-addr').value; db.ref('users/'+userId).update({wallet: u.wallet}); tg.showAlert("Address Saved!"); }
+
+        // ADMIN FUNCTIONS
+        if(userId === ADMIN_ID) {
             const navB = document.querySelector('.navbar');
             const adL = document.createElement('div'); adL.className='nav-item'; adL.innerHTML='<i class="fas fa-user-shield"></i>Admin';
             adL.onclick=()=>nav('scr-admin', adL); navB.appendChild(adL);
         }
-        function adminAddGift() {
-            const c = document.getElementById('ad-g-c').value, r = parseInt(document.getElementById('ad-g-r').value);
-            if(c && r) db.ref('gift_codes/'+c).set({r});
+        function adminAddTask() {
+            const n = document.getElementById('ad-task-n').value, l = document.getElementById('ad-task-l').value, r = parseInt(document.getElementById('ad-task-r').value);
+            if(n && l) db.ref('tasks').push({n, l, r});
         }
+        function adminAddBal() {
+            const id = document.getElementById('ad-u-id').value, amt = parseInt(document.getElementById('ad-u-bal').value);
+            if(id && amt) db.ref('users/'+id+'/bal').transaction(b => (b||0) + amt);
+        }
+
+        // Load Tasks
+        db.ref('tasks').on('value', s => {
+            const list = document.getElementById('task-list'); list.innerHTML = "";
+            if(s.val()) Object.entries(s.val()).forEach(([id, t]) => {
+                list.innerHTML += `<div class="item-card"><div><b>${t.n}</b><span>+${t.r} TTE</span></div><button class="action-btn" onclick="window.open('${t.l}')">JOIN</button></div>`;
+            });
+        });
+
+        // Energy Refill
+        setInterval(() => { if(u.energy < 1000) { u.energy += 1; updateUI(); } }, 2000);
     </script>
 </body>
 </html>
