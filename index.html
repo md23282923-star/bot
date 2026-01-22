@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TTE ELITE - ULTIMATE EDITION</title>
+    <title>TTE ELITE - PREMIUM EDITION</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10499994' data-sdk='show_10499994'></script>
     
@@ -11,160 +11,176 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg: #0b0f19; --card: #161b2a; --gold: #fbbf24; --text: #f8fafc; --accent: #3b82f6; }
+        :root {
+            --bg: #05070a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --gold: #ffcc00;
+            --accent: #00d2ff;
+            --text: #ffffff;
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; height: 100vh; }
+        body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* UI ELEMENTS */
+        /* HEADER STATS */
+        .top-nav { display: flex; justify-content: space-between; padding: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .chip { background: var(--glass); padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+        /* MAIN UI */
         .app-screen { height: calc(100vh - 80px); overflow-y: auto; padding: 20px; display: none; padding-bottom: 100px; }
-        .active-screen { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active-screen { display: block; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* 3D COIN POLISH */
-        .coin-wrapper { display: flex; justify-content: center; margin: 25px 0; }
-        .css-coin {
-            width: 230px; height: 230px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fcd34d, #b45309);
-            border: 10px solid #78350f;
-            box-shadow: inset 0 0 25px rgba(255,255,255,0.6), 0 15px 35px rgba(0,0,0,0.7);
+        .balance-container { text-align: center; margin-top: 10px; }
+        .balance-container h1 { font-family: 'Orbitron', sans-serif; font-size: 45px; margin: 0; background: linear-gradient(to right, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* PREMIUM 3D COIN */
+        .coin-box { display: flex; justify-content: center; margin: 30px 0; }
+        .main-coin {
+            width: 250px; height: 250px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+            border: 12px solid #5c4000;
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2), inset 0 0 30px rgba(255,255,255,0.5);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.05s;
+            cursor: pointer; transition: 0.1s; position: relative;
         }
-        .css-coin:active { transform: scale(0.92); }
-        .coin-symbol { font-size: 55px; font-weight: 900; color: #78350f; text-shadow: 1px 1px #fff; }
+        .main-coin:active { transform: scale(0.95) rotateY(10deg); }
+        .main-coin span { font-family: 'Orbitron', sans-serif; font-size: 60px; font-weight: 900; color: #5c4000; }
 
-        .stat-box { background: var(--card); padding: 12px 18px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); font-weight: 600; }
-        .big-balance { text-align: center; font-size: 48px; font-weight: 900; margin: 15px 0; color: white; letter-spacing: 1px; }
+        /* GRID BUTTONS */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .menu-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; text-align: center; cursor: pointer; backdrop-filter: blur(10px); }
+        .menu-btn i { font-size: 24px; color: var(--gold); display: block; margin-bottom: 8px; }
+        .menu-btn span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .action-btn { background: var(--card); border: 1px solid #2d3748; border-radius: 18px; padding: 15px; text-align: center; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .action-btn:active { background: #1e293b; }
-        .action-btn i { font-size: 22px; color: var(--gold); margin-bottom: 6px; display: block; }
-
-        .energy-bar-bg { background: #1e293b; height: 14px; border-radius: 10px; margin-top: 20px; overflow: hidden; border: 1px solid #2d3748; }
-        .energy-fill { background: linear-gradient(90deg, #fbbf24, #d97706); height: 100%; width: 100%; transition: 0.3s ease; }
-
-        /* POLISHED SPIN WHEEL WITH REWARDS */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
-        .wheel-container { position: relative; width: 300px; height: 300px; }
-        .wheel-box { 
-            width: 100%; height: 100%; border-radius: 50%; border: 10px solid #333;
-            background: conic-gradient(
-                #3b82f6 0deg 72deg, 
-                #ef4444 72deg 144deg, 
-                #fbbf24 144deg 216deg, 
-                #22c55e 216deg 288deg, 
-                #a855f7 288deg 360deg
-            );
-            position: relative; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1);
-            overflow: hidden;
+        /* SPIN WHEEL PREMIUM */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        .wheel-wrap { position: relative; width: 320px; height: 320px; padding: 10px; background: #222; border-radius: 50%; box-shadow: 0 0 30px var(--gold); }
+        .wheel-main { 
+            width: 100%; height: 100%; border-radius: 50%; position: relative;
+            transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1);
+            overflow: hidden; border: 5px solid #000;
         }
-        .wheel-label {
-            position: absolute; width: 50%; height: 50%; transform-origin: bottom right;
-            padding: 20px; font-weight: 900; color: white; font-size: 12px; text-align: center;
-        }
-        .pointer { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid white; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10; filter: drop-shadow(0 2px 5px black); }
+        .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; }
+        
+        /* CARDS */
+        .p-card { background: var(--glass); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .btn-action { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: 900; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: linear-gradient(45deg, #ffd700, #b8860b); color: #000; }
+        .btn-blue { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: #fff; }
 
-        .card { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .btn-p { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-        .inp { width: 100%; padding: 15px; background: #0b0f19; border: 1px solid #2d3748; color: white; border-radius: 12px; margin-bottom: 15px; }
+        /* NAVBAR */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(10,15,25,0.95); display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.05); }
+        .nav-link { text-align: center; color: #555; font-size: 10px; font-weight: 700; text-decoration: none; }
+        .nav-link.active { color: var(--gold); }
+        .nav-link i { font-size: 26px; display: block; margin-bottom: 5px; }
 
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
-        .nav-item { color: #64748b; font-size: 11px; font-weight: 700; text-align: center; opacity: 0.7; }
-        .nav-item.active { color: var(--gold); opacity: 1; }
-        .nav-item i { font-size: 24px; margin-bottom: 4px; display: block; }
+        /* INPUTS */
+        .p-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; color: #fff; margin: 10px 0; }
 
-        .pop { position: absolute; font-weight: 900; color: white; animation: float 0.7s forwards; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        @keyframes float { to { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+        .pop-up { position: absolute; pointer-events: none; font-weight: 900; font-family: 'Orbitron'; animation: float 0.8s ease-out forwards; }
+        @keyframes float { to { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
 
+    <div class="top-nav">
+        <div class="chip"><i class="fas fa-gem" style="color:var(--accent)"></i> <span id="elite-val">0.00</span></div>
+        <div class="chip"><i class="fas fa-bolt" id="b-icon"></i> <span id="b-txt">OFF</span></div>
+    </div>
+
     <div id="scr-mine" class="app-screen active-screen">
-        <div style="display:flex; justify-content: space-between;">
-            <div class="stat-box"><i class="fas fa-gem" style="color:var(--accent)"></i> <span id="elite-val">0.00</span></div>
-            <div class="stat-box"><i class="fas fa-bolt" id="b-icon"></i> <span id="b-timer">BOOST OFF</span></div>
+        <div class="balance-container">
+            <h1 id="bal-main">0</h1>
+            <small style="color:#888; letter-spacing: 2px;">TOTAL TTE COIN</small>
         </div>
-        <div class="big-balance" id="bal-main">0</div>
-        <div class="coin-wrapper"><div class="css-coin" onclick="handleTap(event)"><div class="coin-symbol">TTE</div></div></div>
-        <div class="btn-grid">
-            <div class="action-btn" onclick="showAd('boost')"><i class="fas fa-rocket"></i>BOOST 2X</div>
-            <div class="action-btn" onclick="showSpin()"><i class="fas fa-dharmachakra"></i>SPIN</div>
-            <div class="action-btn" onclick="nav('scr-tasks', this)"><i class="fas fa-tasks"></i>TASKS</div>
+
+        <div class="coin-box">
+            <div class="main-coin" onclick="handleTap(event)"><span>TTE</span></div>
         </div>
-        <div style="margin-top:25px; display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
-            <span>⚡ Energy</span> <span id="en-txt">1000/1000</span>
+
+        <div class="grid-menu">
+            <div class="menu-btn" onclick="startAd('boost')"><i class="fas fa-rocket"></i><span>Boost</span></div>
+            <div class="menu-btn" onclick="openSpin()"><i class="fas fa-dharmachakra"></i><span>Spin</span></div>
+            <div class="menu-btn" onclick="nav('scr-tasks', this)"><i class="fas fa-tasks"></i><span>Tasks</span></div>
         </div>
-        <div class="energy-bar-bg"><div id="en-fill" class="energy-fill"></div></div>
+
+        <div style="margin-top:25px;">
+            <div style="display:flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+                <span>ENERGY SYSTEM</span>
+                <span id="en-txt">1000/1000</span>
+            </div>
+            <div style="height:12px; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.1);">
+                <div id="en-fill" style="width:100%; height:100%; background:linear-gradient(90deg, var(--gold), #ff8800); transition:0.3s;"></div>
+            </div>
+        </div>
     </div>
 
     <div id="scr-tasks" class="app-screen">
-        <h2 style="color:var(--gold)">ELITE MISSIONS</h2>
+        <h2 style="font-family:'Orbitron'; color:var(--gold)">MISSIONS</h2>
         <div id="task-list"></div>
     </div>
 
     <div id="scr-ref" class="app-screen">
-        <h2 style="color:var(--gold)">ALLIANCE</h2>
-        <div class="card" style="text-align:center; display:block; padding: 30px;">
-            <p style="margin-bottom:5px;">Your Total Referrals</p>
-            <h1 style="color:var(--gold); font-size: 50px; margin:0;" id="ref-num">0</h1>
+        <h2 style="font-family:'Orbitron'; color:var(--gold)">ALLIANCE</h2>
+        <div class="p-card" style="text-align:center;">
+            <p>Direct Referrals</p>
+            <h1 style="font-size: 50px; color: var(--gold);" id="ref-count">0</h1>
         </div>
-        <p style="font-size:12px; margin: 15px 0 5px;">Invite Link</p>
-        <input type="text" id="ref-link" class="inp" readonly>
-        <button class="btn-p" style="width:100%; font-size: 16px;" onclick="copyRef()">COPY INVITE LINK</button>
+        <div class="p-card">
+            <p>Your Referral Link</p>
+            <input type="text" id="ref-link" class="p-input" readonly>
+            <button class="btn-action btn-blue" onclick="copyRef()">COPY LINK</button>
+        </div>
     </div>
 
     <div id="scr-wallet" class="app-screen">
-        <h2 style="color:var(--gold)">WALLET</h2>
-        <div class="card" style="display:block; text-align:center; border: 2px solid var(--gold); padding: 25px;">
-            <small>ELITE ASSET BALANCE</small>
-            <h1 style="color:var(--gold); font-size: 40px; margin: 10px 0;" id="elite-wallet">0.00</h1>
-            <button class="btn-p" onclick="swap()">SWAP 1M TTE → 0.1 ELITE</button>
+        <h2 style="font-family:'Orbitron'; color:var(--gold)">WALLET</h2>
+        <div class="p-card" style="text-align:center; border: 1px solid var(--gold);">
+            <p>ELITE ASSET</p>
+            <h1 style="font-size:40px; color:var(--gold); margin:10px 0;" id="elite-wallet">0.00</h1>
+            <button class="btn-action btn-gold" onclick="swap()">SWAP 10M TTE → 0.1 ELITE</button>
         </div>
-        <h3 style="margin-top:20px;">Withdrawal Setup</h3>
-        <input type="text" id="ton-addr" class="inp" placeholder="Enter TON Wallet (UQ...)">
-        <button id="save-w" class="btn-p" style="width:100%" onclick="saveW()">SAVE ADDRESS</button>
+        <div class="p-card">
+            <p>Withdrawal (TON Network)</p>
+            <input type="text" id="ton-addr" class="p-input" placeholder="UQ... Enter Address">
+            <div id="saved-addr-msg" style="font-size:10px; color:var(--accent); margin-bottom:10px;"></div>
+            <button class="btn-action btn-blue" onclick="saveW()">SAVE ADDRESS</button>
+        </div>
     </div>
 
     <div id="scr-admin" class="app-screen">
-        <h2 style="color:var(--gold)">ADMIN PANEL</h2>
-        <div class="card" style="display:block;">
-            <p>Add New Task</p>
-            <input type="text" id="ad-t" placeholder="Task Title" class="inp">
-            <input type="text" id="ad-l" placeholder="Task Link" class="inp">
-            <input type="number" id="ad-r" placeholder="Reward Amount" class="inp">
-            <button class="btn-p" style="width:100%" onclick="addTask()">ADD TASK</button>
+        <h2 style="color:var(--gold)">ADMIN DASHBOARD</h2>
+        <div class="p-card">
+            <input type="text" id="ad-t" placeholder="Task Title" class="p-input">
+            <input type="text" id="ad-l" placeholder="Task Link" class="p-input">
+            <input type="number" id="ad-r" placeholder="Reward" class="p-input">
+            <button class="btn-action btn-gold" onclick="addTask()">ADD TASK</button>
         </div>
         <div id="ad-task-list"></div>
     </div>
 
     <div id="spin-modal" class="modal">
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <div id="wheel" class="wheel-box">
-                <div class="wheel-label" style="transform: rotate(0deg) skew(18deg);">500 TTE</div>
-                <div class="wheel-label" style="transform: rotate(72deg) skew(18deg);">3K TTE</div>
-                <div class="wheel-label" style="transform: rotate(144deg) skew(18deg);">10K TTE</div>
-                <div class="wheel-label" style="transform: rotate(216deg) skew(18deg);">50K TTE</div>
-                <div class="wheel-label" style="transform: rotate(288deg) skew(18deg);">1 ELITE</div>
-            </div>
+        <div class="pointer"></div>
+        <div class="wheel-wrap">
+            <canvas id="wheel-canvas" width="300" height="300"></canvas>
         </div>
-        <div style="margin-top:40px; text-align:center; width: 80%;">
-            <p style="font-size:18px; font-weight:600;">Spins Left: <span id="spin-count" style="color:var(--gold)">0</span></p>
-            <button class="btn-p" style="width:100%; font-size:20px; margin-bottom:10px;" onclick="spinNow()">SPIN NOW</button>
-            <button class="btn-p" style="width:100%; background:var(--gold); color:black;" onclick="showAd('spin')">GET 1 SPIN (AD)</button>
-            <button class="btn-p" style="width:100%; background:#333; margin-top:10px;" onclick="closeSpin()">CLOSE</button>
+        <div style="margin-top:30px; text-align:center; width: 80%;">
+            <p style="font-weight:700;">SPINS: <span id="spin-val" style="color:var(--gold)">0</span></p>
+            <button class="btn-action btn-blue" style="margin-bottom:10px;" onclick="spinNow()">SPIN NOW</button>
+            <button class="btn-action btn-gold" onclick="startAd('spin')">GET SPIN (AD)</button>
+            <button class="btn-action" style="background:#222; margin-top:10px; color:#fff;" onclick="closeSpin()">CLOSE</button>
         </div>
     </div>
 
-    <nav class="navbar">
-        <div class="nav-item active" onclick="nav('scr-mine', this)"><i class="fas fa-hammer"></i>Mine</div>
-        <div class="nav-item" onclick="nav('scr-tasks', this)"><i class="fas fa-clipboard-list"></i>Tasks</div>
-        <div class="nav-item" onclick="nav('scr-ref', this)"><i class="fas fa-user-friends"></i>Refer</div>
-        <div class="nav-item" onclick="nav('scr-wallet', this)"><i class="fas fa-wallet"></i>Wallet</div>
+    <nav class="nav-bar">
+        <div class="nav-link active" onclick="nav('scr-mine', this)"><i class="fas fa-hammer"></i>Mine</div>
+        <div class="nav-link" onclick="nav('scr-tasks', this)"><i class="fas fa-tasks"></i>Tasks</div>
+        <div class="nav-link" onclick="nav('scr-ref', this)"><i class="fas fa-user-friends"></i>Refer</div>
+        <div class="nav-link" onclick="nav('scr-wallet', this)"><i class="fas fa-wallet"></i>Wallet</div>
     </nav>
 
     <script>
@@ -174,69 +190,78 @@
         const ADMIN_ID = "7178946316";
         const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "dev_user";
 
-        let u = { bal: 0, elite: 0, energy: 1000, spins: 0, ref: 0, bUntil: 0, wallet: "", ads: 0 };
+        let u = { bal: 0, elite: 0, energy: 1000, spins: 0, bUntil: 0, wallet: "", ref: 0 };
+        const rewards = ["500", "1000", "5000", "10000", "0.1 ELITE"];
+        const colors = ["#3b82f6", "#ef4444", "#fbbf24", "#22c55e", "#a855f7"];
 
         db.ref('users/' + userId).on('value', s => {
-            if(s.val()) { u = {...u, ...s.val()}; updateUI(); }
-            else { db.ref('users/' + userId).set(u); }
+            if(s.val()) { 
+                u = {...u, ...s.val()}; 
+                updateUI(); 
+                if(u.wallet) document.getElementById('saved-addr-msg').innerText = "Current: " + u.wallet;
+            } else { db.ref('users/'+userId).set(u); }
         });
 
         if(userId === ADMIN_ID) {
-            const navBar = document.querySelector('.navbar');
-            const adIco = document.createElement('div'); adIco.className='nav-item'; 
-            adIco.innerHTML='<i class="fas fa-shield-alt"></i>Admin';
-            adIco.onclick=()=>nav('scr-admin', adIco); navBar.appendChild(adIco); loadAdmin();
+            const navB = document.querySelector('.nav-bar');
+            const adI = document.createElement('div'); adI.className='nav-link'; adI.innerHTML='<i class="fas fa-user-shield"></i>Admin';
+            adI.onclick=()=>nav('scr-admin', adI); navB.appendChild(adI); loadAdmin();
         }
 
-        // MONETAG REWARDED AD
-        function showAd(type) {
+        // CANVAS WHEEL REWARDS DRAWING
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        function drawWheel() {
+            const arc = (Math.PI * 2) / rewards.length;
+            rewards.forEach((r, i) => {
+                ctx.beginPath(); ctx.fillStyle = colors[i];
+                ctx.moveTo(150, 150); ctx.arc(150, 150, 150, i * arc, (i + 1) * arc); ctx.fill();
+                ctx.save(); ctx.translate(150, 150); ctx.rotate(i * arc + arc/2);
+                ctx.fillStyle = "white"; ctx.font = "bold 14px Orbitron"; ctx.fillText(r, 60, 10); ctx.restore();
+            });
+        }
+        drawWheel();
+
+        function startAd(type) {
             show_10499994().then(() => {
-                if(type === 'boost') { 
-                    u.bUntil = Date.now() + (12 * 60 * 60 * 1000); 
-                    tg.showAlert("🚀 12H Boost Activated!"); 
-                } else if(type === 'spin') { 
-                    u.spins++; 
-                    tg.showAlert("🎁 1 Spin Earned!"); 
-                }
-                u.ads++; db.ref('users/'+userId).update({bUntil: u.bUntil, spins: u.spins, ads: u.ads});
-            }).catch(e => { tg.showAlert("Ad not ready yet!"); });
+                if(type === 'boost') u.bUntil = Date.now() + (12 * 60 * 60 * 1000);
+                else if(type === 'spin') u.spins++;
+                db.ref('users/'+userId).update({bUntil: u.bUntil, spins: u.spins});
+                tg.showAlert("Success! Reward Added.");
+            }).catch(e => tg.showAlert("Ad not ready!"));
         }
 
         function handleTap(e) {
             let p = (Date.now() < u.bUntil) ? 2 : 1;
             if(u.energy >= p) {
                 u.bal += p; u.energy -= p;
-                document.getElementById('bal-main').innerText = Math.floor(u.bal).toLocaleString();
-                const x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY;
-                const t = document.createElement('div'); t.className='pop'; t.style.left=x+'px'; t.style.top=y+'px'; t.innerText='+'+p;
-                document.body.appendChild(t); setTimeout(()=>t.remove(), 700);
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                const t = document.createElement('div'); t.className='pop-up';
+                t.style.left=x+'px'; t.style.top=y+'px'; t.innerText='+'+p; t.style.color = p === 2 ? '#ffcc00' : '#fff';
+                document.body.appendChild(t); setTimeout(()=>t.remove(), 800);
                 tg.HapticFeedback.impactOccurred('medium');
                 db.ref('users/'+userId).update({bal: u.bal, energy: u.energy});
             }
         }
 
-        function showSpin() { document.getElementById('spin-modal').style.display='flex'; }
+        function openSpin() { document.getElementById('spin-modal').style.display='flex'; }
         function closeSpin() { document.getElementById('spin-modal').style.display='none'; }
-        
+
         function spinNow() {
             if(u.spins <= 0) return tg.showAlert("Need Spins!");
-            const w = document.getElementById('wheel');
-            let deg = 3600 + Math.floor(Math.random() * 360);
-            w.style.transform = `rotate(${deg}deg)`; u.spins--;
-            db.ref('users/'+userId).update({spins: u.spins});
+            const canvasEl = document.getElementById('wheel-canvas');
+            let randDeg = 3600 + Math.floor(Math.random() * 360);
+            canvasEl.style.transition = "4s cubic-bezier(0.1, 0, 0.1, 1)";
+            canvasEl.style.transform = `rotate(${randDeg}deg)`;
+            u.spins--; db.ref('users/'+userId).update({spins: u.spins});
 
             setTimeout(() => {
-                let win = ""; let r = Math.random();
-                if(r > 0.98) { u.elite += 1; win="1 ELITE"; }
-                else if(r > 0.90) { u.bal += 50000; win="50,000 TTE"; }
-                else if(r > 0.70) { u.bal += 10000; win="10,000 TTE"; }
-                else if(r > 0.40) { u.bal += 3000; win="3,000 TTE"; }
-                else { u.bal += 500; win="500 TTE"; }
-                
+                let win = rewards[Math.floor(Math.random() * rewards.length)];
+                if(win.includes("ELITE")) u.elite += 0.1; else u.bal += parseInt(win);
                 db.ref('users/'+userId).update({bal: u.bal, elite: u.elite});
-                tg.showAlert("JACKPOT: " + win);
-                w.style.transition='none'; w.style.transform='rotate(0deg)';
-                setTimeout(()=>w.style.transition='4s cubic-bezier(0.1, 0, 0.1, 1)', 50);
+                tg.showAlert("WON: " + win);
+                canvasEl.style.transition = "none"; canvasEl.style.transform = "rotate(0deg)";
             }, 4100);
         }
 
@@ -244,33 +269,35 @@
             document.getElementById('bal-main').innerText = Math.floor(u.bal).toLocaleString();
             document.getElementById('elite-val').innerText = u.elite.toFixed(2);
             document.getElementById('elite-wallet').innerText = u.elite.toFixed(2);
-            document.getElementById('spin-count').innerText = u.spins;
+            document.getElementById('spin-val').innerText = u.spins;
+            document.getElementById('ref-count').innerText = u.ref;
             document.getElementById('en-txt').innerText = u.energy + "/1000";
             document.getElementById('en-fill').style.width = (u.energy/10) + "%";
             document.getElementById('ref-link').value = "https://t.me/taptoearn_tte_bot?start=" + userId;
             const b = Date.now() < u.bUntil;
-            document.getElementById('b-timer').innerText = b ? "BOOST ACTIVE" : "BOOST OFF";
-            document.getElementById('b-icon').style.color = b ? "var(--gold)" : "white";
+            document.getElementById('b-txt').innerText = b ? "ACTIVE" : "OFF";
+            document.getElementById('b-icon').style.color = b ? "#ffcc00" : "#fff";
         }
 
         function nav(id, el) {
             document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
 
         db.ref('tasks').on('value', s => {
             const list = document.getElementById('task-list'); list.innerHTML = "";
             if(s.val()) Object.values(s.val()).forEach(t => {
-                list.innerHTML += `<div class="card"><div><b>${t.title}</b><br><small>+${t.reward} TTE</small></div>
-                <button class="btn-p" onclick="doT('${t.id}',${t.reward},'${t.link}')">START</button></div>`;
+                list.innerHTML += `<div class="p-card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><b>${t.title}</b><br><small>+${t.reward} TTE</small></div>
+                <button class="btn-action btn-blue" style="width:auto;" onclick="doTask('${t.id}',${t.reward},'${t.link}')">START</button></div>`;
             });
         });
 
-        function doT(id, r, l) {
+        function doTask(id, r, l) {
             tg.openLink(l);
-            setTimeout(() => { if(confirm("Task Complete?")) { u.bal += r; db.ref('users/'+userId).update({bal: u.bal}); }}, 4000);
+            setTimeout(() => { if(confirm("Joined?")) { u.bal += r; db.ref('users/'+userId).update({bal: u.bal}); }}, 4000);
         }
 
         function addTask() {
@@ -281,13 +308,13 @@
         function loadAdmin() {
             db.ref('tasks').on('value', s => {
                 const al = document.getElementById('ad-task-list'); al.innerHTML = "";
-                if(s.val()) Object.values(s.val()).forEach(t => { al.innerHTML += `<div class="card"><span>${t.title}</span><button onclick="db.ref('tasks/${t.id}').remove()" style="background:red; color:white; border:none; padding:8px; border-radius:8px;">REMOVE</button></div>`; });
+                if(s.val()) Object.values(s.val()).forEach(t => { al.innerHTML += `<div class="p-card"><span>${t.title}</span><button onclick="db.ref('tasks/${t.id}').remove()" style="color:red; background:none; border:none; cursor:pointer;">DEL</button></div>`; });
             });
         }
 
-        function swap() { if(u.bal >= 1000000) { u.bal -= 1000000; u.elite += 0.1; db.ref('users/'+userId).update({bal: u.bal, elite: u.elite}); tg.showAlert("Swap Success!"); } else { tg.showAlert("Need 1M TTE!"); }}
-        function saveW() { u.wallet = document.getElementById('ton-addr').value; db.ref('users/'+userId).update({wallet: u.wallet}); tg.showAlert("Wallet Saved!"); }
-        function copyRef() { document.getElementById('ref-link').select(); document.execCommand('copy'); tg.showAlert("Link Copied!"); }
+        function swap() { if(u.bal >= 10000000) { u.bal -= 10000000; u.elite += 0.1; db.ref('users/'+userId).update({bal:u.bal, elite:u.elite}); tg.showAlert("Swapped!"); } else { tg.showAlert("Need 10M TTE!"); }}
+        function saveW() { u.wallet = document.getElementById('ton-addr').value; db.ref('users/'+userId).update({wallet: u.wallet}); tg.showAlert("Saved!"); }
+        function copyRef() { document.getElementById('ref-link').select(); document.execCommand('copy'); tg.showAlert("Copied!"); }
         setInterval(() => { if(u.energy < 1000) { u.energy++; updateUI(); }}, 1500);
     </script>
 </body>
