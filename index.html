@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TTE ELITE - MONETAG VERSION</title>
+    <title>TTE ELITE - ULTIMATE EDITION</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10499994' data-sdk='show_10499994'></script>
     
@@ -23,92 +23,147 @@
         .active-screen { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* COIN */
+        /* 3D COIN POLISH */
         .coin-wrapper { display: flex; justify-content: center; margin: 25px 0; }
         .css-coin {
-            width: 220px; height: 220px; border-radius: 50%;
+            width: 230px; height: 230px; border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #fcd34d, #b45309);
-            border: 8px solid #78350f;
-            box-shadow: inset 0 0 20px rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.6);
+            border: 10px solid #78350f;
+            box-shadow: inset 0 0 25px rgba(255,255,255,0.6), 0 15px 35px rgba(0,0,0,0.7);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: transform 0.05s;
         }
         .css-coin:active { transform: scale(0.92); }
-        .coin-symbol { font-size: 50px; font-weight: 900; color: #78350f; }
+        .coin-symbol { font-size: 55px; font-weight: 900; color: #78350f; text-shadow: 1px 1px #fff; }
 
-        .stat-box { background: var(--card); padding: 10px; border-radius: 12px; font-size: 14px; }
-        .big-balance { text-align: center; font-size: 40px; font-weight: 900; margin: 15px 0; }
+        .stat-box { background: var(--card); padding: 12px 18px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); font-weight: 600; }
+        .big-balance { text-align: center; font-size: 48px; font-weight: 900; margin: 15px 0; color: white; letter-spacing: 1px; }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .action-btn { background: var(--card); border-radius: 15px; padding: 12px; text-align: center; font-size: 10px; font-weight: 700; cursor: pointer; border: 1px solid #2d3748; }
-        .action-btn i { font-size: 20px; color: var(--gold); margin-bottom: 5px; display: block; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .action-btn { background: var(--card); border: 1px solid #2d3748; border-radius: 18px; padding: 15px; text-align: center; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .action-btn:active { background: #1e293b; }
+        .action-btn i { font-size: 22px; color: var(--gold); margin-bottom: 6px; display: block; }
 
-        .energy-bar-bg { background: #1e293b; height: 10px; border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        .energy-fill { background: linear-gradient(90deg, var(--gold), #d97706); height: 100%; width: 100%; transition: 0.3s; }
+        .energy-bar-bg { background: #1e293b; height: 14px; border-radius: 10px; margin-top: 20px; overflow: hidden; border: 1px solid #2d3748; }
+        .energy-fill { background: linear-gradient(90deg, #fbbf24, #d97706); height: 100%; width: 100%; transition: 0.3s ease; }
 
-        /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
+        /* POLISHED SPIN WHEEL WITH REWARDS */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
+        .wheel-container { position: relative; width: 300px; height: 300px; }
         .wheel-box { 
-            width: 260px; height: 260px; border-radius: 50%; border: 5px solid #fff;
-            background: conic-gradient(#3b82f6 0 72deg, #ef4444 72deg 144deg, #fbbf24 144deg 216deg, #22c55e 216deg 288deg, #a855f7 288deg 360deg);
-            transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1);
+            width: 100%; height: 100%; border-radius: 50%; border: 10px solid #333;
+            background: conic-gradient(
+                #3b82f6 0deg 72deg, 
+                #ef4444 72deg 144deg, 
+                #fbbf24 144deg 216deg, 
+                #22c55e 216deg 288deg, 
+                #a855f7 288deg 360deg
+            );
+            position: relative; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1);
+            overflow: hidden;
         }
+        .wheel-label {
+            position: absolute; width: 50%; height: 50%; transform-origin: bottom right;
+            padding: 20px; font-weight: 900; color: white; font-size: 12px; text-align: center;
+        }
+        .pointer { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid white; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10; filter: drop-shadow(0 2px 5px black); }
 
-        .card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .btn-p { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 700; }
-        .inp { width: 100%; padding: 12px; background: #0b0f19; border: 1px solid #2d3748; color: white; border-radius: 8px; margin-bottom: 10px; }
+        .card { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-p { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .inp { width: 100%; padding: 15px; background: #0b0f19; border: 1px solid #2d3748; color: white; border-radius: 12px; margin-bottom: 15px; }
 
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { color: #64748b; font-size: 10px; text-align: center; }
-        .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 20px; display: block; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: #0b0f19; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-item { color: #64748b; font-size: 11px; font-weight: 700; text-align: center; opacity: 0.7; }
+        .nav-item.active { color: var(--gold); opacity: 1; }
+        .nav-item i { font-size: 24px; margin-bottom: 4px; display: block; }
 
-        .pop { position: absolute; font-weight: 900; color: white; animation: float 0.7s forwards; pointer-events: none; }
-        @keyframes float { to { transform: translateY(-80px); opacity: 0; } }
+        .pop { position: absolute; font-weight: 900; color: white; animation: float 0.7s forwards; pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        @keyframes float { to { transform: translateY(-100px) scale(1.5); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="scr-mine" class="app-screen active-screen">
         <div style="display:flex; justify-content: space-between;">
-            <div class="stat-box">💎 <span id="elite-val">0.00</span></div>
-            <div class="stat-box">⚡ Boost: <span id="b-timer">OFF</span></div>
+            <div class="stat-box"><i class="fas fa-gem" style="color:var(--accent)"></i> <span id="elite-val">0.00</span></div>
+            <div class="stat-box"><i class="fas fa-bolt" id="b-icon"></i> <span id="b-timer">BOOST OFF</span></div>
         </div>
         <div class="big-balance" id="bal-main">0</div>
         <div class="coin-wrapper"><div class="css-coin" onclick="handleTap(event)"><div class="coin-symbol">TTE</div></div></div>
         <div class="btn-grid">
-            <div class="action-btn" onclick="showMonetagAd('boost')"><i class="fas fa-rocket"></i>BOOST</div>
+            <div class="action-btn" onclick="showAd('boost')"><i class="fas fa-rocket"></i>BOOST 2X</div>
             <div class="action-btn" onclick="showSpin()"><i class="fas fa-dharmachakra"></i>SPIN</div>
             <div class="action-btn" onclick="nav('scr-tasks', this)"><i class="fas fa-tasks"></i>TASKS</div>
         </div>
-        <div style="margin-top:20px; font-size:12px;">Energy: <span id="en-txt">1000/1000</span></div>
+        <div style="margin-top:25px; display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
+            <span>⚡ Energy</span> <span id="en-txt">1000/1000</span>
+        </div>
         <div class="energy-bar-bg"><div id="en-fill" class="energy-fill"></div></div>
     </div>
 
-    <div id="scr-tasks" class="app-screen"><h2>TASKS</h2><div id="task-list"></div></div>
-    <div id="scr-ref" class="app-screen"><h2>REFERRAL</h2><input type="text" id="ref-link" class="inp" readonly><button class="btn-p" style="width:100%" onclick="copyRef()">COPY LINK</button></div>
-    <div id="scr-wallet" class="app-screen"><h2>WALLET</h2><div class="card" style="display:block; text-align:center;"><h1>💎 <span id="elite-wallet">0.00</span></h1><button class="btn-p" onclick="swap()">SWAP 1M TTE</button></div><input type="text" id="ton-addr" class="inp" placeholder="TON Address"><button class="btn-p" style="width:100%" onclick="saveW()">SAVE</button></div>
+    <div id="scr-tasks" class="app-screen">
+        <h2 style="color:var(--gold)">ELITE MISSIONS</h2>
+        <div id="task-list"></div>
+    </div>
+
+    <div id="scr-ref" class="app-screen">
+        <h2 style="color:var(--gold)">ALLIANCE</h2>
+        <div class="card" style="text-align:center; display:block; padding: 30px;">
+            <p style="margin-bottom:5px;">Your Total Referrals</p>
+            <h1 style="color:var(--gold); font-size: 50px; margin:0;" id="ref-num">0</h1>
+        </div>
+        <p style="font-size:12px; margin: 15px 0 5px;">Invite Link</p>
+        <input type="text" id="ref-link" class="inp" readonly>
+        <button class="btn-p" style="width:100%; font-size: 16px;" onclick="copyRef()">COPY INVITE LINK</button>
+    </div>
+
+    <div id="scr-wallet" class="app-screen">
+        <h2 style="color:var(--gold)">WALLET</h2>
+        <div class="card" style="display:block; text-align:center; border: 2px solid var(--gold); padding: 25px;">
+            <small>ELITE ASSET BALANCE</small>
+            <h1 style="color:var(--gold); font-size: 40px; margin: 10px 0;" id="elite-wallet">0.00</h1>
+            <button class="btn-p" onclick="swap()">SWAP 1M TTE → 0.1 ELITE</button>
+        </div>
+        <h3 style="margin-top:20px;">Withdrawal Setup</h3>
+        <input type="text" id="ton-addr" class="inp" placeholder="Enter TON Wallet (UQ...)">
+        <button id="save-w" class="btn-p" style="width:100%" onclick="saveW()">SAVE ADDRESS</button>
+    </div>
 
     <div id="scr-admin" class="app-screen">
-        <h2>ADMIN</h2>
-        <div class="card" style="display:block;"><input type="text" id="ad-t" placeholder="Title" class="inp"><input type="text" id="ad-l" placeholder="Link" class="inp"><input type="number" id="ad-r" placeholder="Reward" class="inp"><button class="btn-p" style="width:100%" onclick="addTask()">ADD TASK</button></div>
+        <h2 style="color:var(--gold)">ADMIN PANEL</h2>
+        <div class="card" style="display:block;">
+            <p>Add New Task</p>
+            <input type="text" id="ad-t" placeholder="Task Title" class="inp">
+            <input type="text" id="ad-l" placeholder="Task Link" class="inp">
+            <input type="number" id="ad-r" placeholder="Reward Amount" class="inp">
+            <button class="btn-p" style="width:100%" onclick="addTask()">ADD TASK</button>
+        </div>
         <div id="ad-task-list"></div>
     </div>
 
     <div id="spin-modal" class="modal">
-        <div id="wheel" class="wheel-box"></div>
-        <div style="margin-top:20px; text-align:center;">
-            <p>Spins: <span id="spin-count">0</span></p>
-            <button class="btn-p" onclick="spinNow()">SPIN</button>
-            <button class="btn-p" style="background:#444" onclick="closeSpin()">BACK</button>
-            <button class="btn-p" style="display:block; width:100%; margin-top:10px; background:var(--gold); color:black;" onclick="showMonetagAd('spin')">AD FOR SPIN</button>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div id="wheel" class="wheel-box">
+                <div class="wheel-label" style="transform: rotate(0deg) skew(18deg);">500 TTE</div>
+                <div class="wheel-label" style="transform: rotate(72deg) skew(18deg);">3K TTE</div>
+                <div class="wheel-label" style="transform: rotate(144deg) skew(18deg);">10K TTE</div>
+                <div class="wheel-label" style="transform: rotate(216deg) skew(18deg);">50K TTE</div>
+                <div class="wheel-label" style="transform: rotate(288deg) skew(18deg);">1 ELITE</div>
+            </div>
+        </div>
+        <div style="margin-top:40px; text-align:center; width: 80%;">
+            <p style="font-size:18px; font-weight:600;">Spins Left: <span id="spin-count" style="color:var(--gold)">0</span></p>
+            <button class="btn-p" style="width:100%; font-size:20px; margin-bottom:10px;" onclick="spinNow()">SPIN NOW</button>
+            <button class="btn-p" style="width:100%; background:var(--gold); color:black;" onclick="showAd('spin')">GET 1 SPIN (AD)</button>
+            <button class="btn-p" style="width:100%; background:#333; margin-top:10px;" onclick="closeSpin()">CLOSE</button>
         </div>
     </div>
 
     <nav class="navbar">
         <div class="nav-item active" onclick="nav('scr-mine', this)"><i class="fas fa-hammer"></i>Mine</div>
-        <div class="nav-item" onclick="nav('scr-tasks', this)"><i class="fas fa-tasks"></i>Tasks</div>
-        <div class="nav-item" onclick="nav('scr-ref', this)"><i class="fas fa-users"></i>Refer</div>
+        <div class="nav-item" onclick="nav('scr-tasks', this)"><i class="fas fa-clipboard-list"></i>Tasks</div>
+        <div class="nav-item" onclick="nav('scr-ref', this)"><i class="fas fa-user-friends"></i>Refer</div>
         <div class="nav-item" onclick="nav('scr-wallet', this)"><i class="fas fa-wallet"></i>Wallet</div>
     </nav>
 
@@ -116,25 +171,34 @@
         const firebaseConfig = { apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU", authDomain: "tte-game.firebaseapp.com", databaseURL: "https://tte-game-default-rtdb.firebaseio.com", projectId: "tte-game", storageBucket: "tte-game.firebasestorage.app", messagingSenderId: "1067385955645", appId: "1:1067385955645:web:09b237ceaf180459311154" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database(), tg = window.Telegram.WebApp;
-        const ADMIN_ID = "7178946316", userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "test_user";
+        const ADMIN_ID = "7178946316";
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "dev_user";
 
-        let u = { bal: 0, elite: 0, energy: 1000, spins: 0, bUntil: 0, wallet: "" };
+        let u = { bal: 0, elite: 0, energy: 1000, spins: 0, ref: 0, bUntil: 0, wallet: "", ads: 0 };
 
-        db.ref('users/' + userId).on('value', s => { if(s.val()){ u = {...u, ...s.val()}; updateUI(); } else { db.ref('users/'+userId).set(u); }});
+        db.ref('users/' + userId).on('value', s => {
+            if(s.val()) { u = {...u, ...s.val()}; updateUI(); }
+            else { db.ref('users/' + userId).set(u); }
+        });
 
         if(userId === ADMIN_ID) {
-            const navB = document.querySelector('.navbar');
-            const adI = document.createElement('div'); adI.className='nav-item'; adI.innerHTML='<i class="fas fa-user-shield"></i>Admin';
-            adI.onclick=()=>nav('scr-admin', adI); navB.appendChild(adI); loadAdmin();
+            const navBar = document.querySelector('.navbar');
+            const adIco = document.createElement('div'); adIco.className='nav-item'; 
+            adIco.innerHTML='<i class="fas fa-shield-alt"></i>Admin';
+            adIco.onclick=()=>nav('scr-admin', adIco); navBar.appendChild(adIco); loadAdmin();
         }
 
-        // MONETAG REWARDED AD FUNCTION
-        function showMonetagAd(type) {
+        // MONETAG REWARDED AD
+        function showAd(type) {
             show_10499994().then(() => {
-                // Reward logic after successful ad watch
-                if(type === 'boost') { u.bUntil = Date.now() + (12 * 60 * 60 * 1000); tg.showAlert("🔥 12H Boost Active!"); }
-                else if(type === 'spin') { u.spins++; tg.showAlert("🎁 +1 Spin Added!"); }
-                db.ref('users/'+userId).update({bUntil: u.bUntil, spins: u.spins});
+                if(type === 'boost') { 
+                    u.bUntil = Date.now() + (12 * 60 * 60 * 1000); 
+                    tg.showAlert("🚀 12H Boost Activated!"); 
+                } else if(type === 'spin') { 
+                    u.spins++; 
+                    tg.showAlert("🎁 1 Spin Earned!"); 
+                }
+                u.ads++; db.ref('users/'+userId).update({bUntil: u.bUntil, spins: u.spins, ads: u.ads});
             }).catch(e => { tg.showAlert("Ad not ready yet!"); });
         }
 
@@ -142,24 +206,36 @@
             let p = (Date.now() < u.bUntil) ? 2 : 1;
             if(u.energy >= p) {
                 u.bal += p; u.energy -= p;
+                document.getElementById('bal-main').innerText = Math.floor(u.bal).toLocaleString();
                 const x = e.touches ? e.touches[0].clientX : e.clientX, y = e.touches ? e.touches[0].clientY : e.clientY;
                 const t = document.createElement('div'); t.className='pop'; t.style.left=x+'px'; t.style.top=y+'px'; t.innerText='+'+p;
                 document.body.appendChild(t); setTimeout(()=>t.remove(), 700);
-                tg.HapticFeedback.impactOccurred('light');
+                tg.HapticFeedback.impactOccurred('medium');
                 db.ref('users/'+userId).update({bal: u.bal, energy: u.energy});
             }
         }
 
         function showSpin() { document.getElementById('spin-modal').style.display='flex'; }
         function closeSpin() { document.getElementById('spin-modal').style.display='none'; }
+        
         function spinNow() {
-            if(u.spins <= 0) return tg.showAlert("No Spins!");
-            const w = document.getElementById('wheel'); let deg = 3600 + Math.floor(Math.random()*360);
+            if(u.spins <= 0) return tg.showAlert("Need Spins!");
+            const w = document.getElementById('wheel');
+            let deg = 3600 + Math.floor(Math.random() * 360);
             w.style.transform = `rotate(${deg}deg)`; u.spins--;
             db.ref('users/'+userId).update({spins: u.spins});
+
             setTimeout(() => {
-                let win = 1000; u.bal += win; db.ref('users/'+userId).update({bal: u.bal});
-                tg.showAlert("Won 1000 TTE!"); w.style.transition='none'; w.style.transform='rotate(0deg)';
+                let win = ""; let r = Math.random();
+                if(r > 0.98) { u.elite += 1; win="1 ELITE"; }
+                else if(r > 0.90) { u.bal += 50000; win="50,000 TTE"; }
+                else if(r > 0.70) { u.bal += 10000; win="10,000 TTE"; }
+                else if(r > 0.40) { u.bal += 3000; win="3,000 TTE"; }
+                else { u.bal += 500; win="500 TTE"; }
+                
+                db.ref('users/'+userId).update({bal: u.bal, elite: u.elite});
+                tg.showAlert("JACKPOT: " + win);
+                w.style.transition='none'; w.style.transform='rotate(0deg)';
                 setTimeout(()=>w.style.transition='4s cubic-bezier(0.1, 0, 0.1, 1)', 50);
             }, 4100);
         }
@@ -172,12 +248,14 @@
             document.getElementById('en-txt').innerText = u.energy + "/1000";
             document.getElementById('en-fill').style.width = (u.energy/10) + "%";
             document.getElementById('ref-link').value = "https://t.me/taptoearn_tte_bot?start=" + userId;
-            document.getElementById('b-timer').innerText = (Date.now() < u.bUntil) ? "ACTIVE" : "OFF";
+            const b = Date.now() < u.bUntil;
+            document.getElementById('b-timer').innerText = b ? "BOOST ACTIVE" : "BOOST OFF";
+            document.getElementById('b-icon').style.color = b ? "var(--gold)" : "white";
         }
 
         function nav(id, el) {
-            document.querySelectorAll('.app-screen').forEach(s => s.style.display='none');
-            document.getElementById(id).style.display='block';
+            document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(id).classList.add('active-screen');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
@@ -185,9 +263,15 @@
         db.ref('tasks').on('value', s => {
             const list = document.getElementById('task-list'); list.innerHTML = "";
             if(s.val()) Object.values(s.val()).forEach(t => {
-                list.innerHTML += `<div class="card"><div><b>${t.title}</b><br><small>+${t.reward}</small></div><button class="btn-p" onclick="tg.openLink('${t.link}')">GO</button></div>`;
+                list.innerHTML += `<div class="card"><div><b>${t.title}</b><br><small>+${t.reward} TTE</small></div>
+                <button class="btn-p" onclick="doT('${t.id}',${t.reward},'${t.link}')">START</button></div>`;
             });
         });
+
+        function doT(id, r, l) {
+            tg.openLink(l);
+            setTimeout(() => { if(confirm("Task Complete?")) { u.bal += r; db.ref('users/'+userId).update({bal: u.bal}); }}, 4000);
+        }
 
         function addTask() {
             const t = document.getElementById('ad-t').value, l = document.getElementById('ad-l').value, r = document.getElementById('ad-r').value;
@@ -197,13 +281,14 @@
         function loadAdmin() {
             db.ref('tasks').on('value', s => {
                 const al = document.getElementById('ad-task-list'); al.innerHTML = "";
-                if(s.val()) Object.values(s.val()).forEach(t => { al.innerHTML += `<div class="card"><span>${t.title}</span><button onclick="db.ref('tasks/${t.id}').remove()" style="background:red;border:none;color:white;">DEL</button></div>`; });
+                if(s.val()) Object.values(s.val()).forEach(t => { al.innerHTML += `<div class="card"><span>${t.title}</span><button onclick="db.ref('tasks/${t.id}').remove()" style="background:red; color:white; border:none; padding:8px; border-radius:8px;">REMOVE</button></div>`; });
             });
         }
 
-        setInterval(() => { if(u.energy < 1000) { u.energy++; updateUI(); }}, 2000);
-        function copyRef() { document.getElementById('ref-link').select(); document.execCommand('copy'); tg.showAlert("Copied!"); }
-        function swap() { if(u.bal >= 1000000) { u.bal -= 1000000; u.elite += 0.1; db.ref('users/'+userId).update({bal:u.bal, elite:u.elite}); } else { tg.showAlert("Need 1M!"); }}
+        function swap() { if(u.bal >= 1000000) { u.bal -= 1000000; u.elite += 0.1; db.ref('users/'+userId).update({bal: u.bal, elite: u.elite}); tg.showAlert("Swap Success!"); } else { tg.showAlert("Need 1M TTE!"); }}
+        function saveW() { u.wallet = document.getElementById('ton-addr').value; db.ref('users/'+userId).update({wallet: u.wallet}); tg.showAlert("Wallet Saved!"); }
+        function copyRef() { document.getElementById('ref-link').select(); document.execCommand('copy'); tg.showAlert("Link Copied!"); }
+        setInterval(() => { if(u.energy < 1000) { u.energy++; updateUI(); }}, 1500);
     </script>
 </body>
 </html>
