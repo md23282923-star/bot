@@ -3,300 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTE ELITE – Ultimate Mini App</title>
+<title>TTE – Real Mining Project</title>
 
-<!-- TELEGRAM -->
+<!-- Telegram -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- MONETAG -->
-<script src="//libtl.com/sdk.js" data-zone="10499994" data-sdk="show_10499994"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<!-- Monetag -->
+<script src='//libtl.com/sdk.js' data-zone='10499994' data-sdk='show_10499994'></script>
 
+<!-- Fonts / Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
---bg:#05070a;--card:#0e1218;--gold:#ffcc00;--accent:#00d2ff;--elite:#8b5cf6;
+--bg:#07090d;
+--card:#12151c;
+--gold:#f3c623;
+--accent:#00d2ff;
+--elite:#8b5cf6;
+--text:#fff;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#fff;font-family:Poppins;height:100vh;overflow:hidden}
-.top{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #111}
-.stat{text-align:center;font-size:10px}
-.stat b{display:block;color:var(--gold);font-family:Orbitron}
-.screen{display:none;padding:14px;height:calc(100vh - 120px);overflow-y:auto}
-.screen.active{display:block}
-.balance{text-align:center;margin:10px 0}
+*{box-sizing:border-box;font-family:Poppins}
+body{margin:0;background:var(--bg);color:var(--text)}
+
+header{
+padding:12px;
+background:#000;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:1px solid #222;
+}
+header b{font-family:Orbitron;color:var(--gold)}
+
+.container{padding:15px;padding-bottom:90px}
+
+.balance{text-align:center;margin-top:15px}
 .balance h1{font-family:Orbitron;font-size:34px;margin:0}
-.coin-box{display:flex;justify-content:center;margin:20px}
+.balance p{color:var(--gold);font-size:12px}
+
 .coin{
-width:190px;height:190px;border-radius:50%;
-background:radial-gradient(circle,var(--gold),#9c7b00);
-display:flex;align-items:center;justify-content:center;
-font-family:Orbitron;font-size:44px;font-weight:900;color:#000;
-border:8px solid #3b2f00;cursor:pointer
+width:200px;height:200px;
+border-radius:50%;
+background:radial-gradient(circle,#f3c623,#9c7a00);
+margin:20px auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:Orbitron;
+font-size:42px;
+font-weight:900;
+color:#3d3100;
+box-shadow:0 0 40px rgba(243,198,35,.25);
 }
-.card{background:var(--card);border:1px solid #1a1a1a;border-radius:18px;padding:14px;margin-bottom:14px}
-.progress{background:#222;height:8px;border-radius:10px;overflow:hidden}
-.progress span{display:block;height:100%;background:var(--gold)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn{border:none;border-radius:14px;padding:12px;font-weight:800;cursor:pointer}
-.btn-dark{background:#111;color:#fff;border:1px solid #333}
-.btn-gold{background:var(--gold);color:#000}
-.up-card{background:rgba(255,255,255,.04);border:1px solid #222;border-radius:20px;padding:14px;text-align:center}
-.up-card small{color:var(--gold);font-weight:900;font-size:9px}
-.up-card b{display:block;margin:6px 0}
+
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:8px;
+margin-top:10px;
+}
+.stat{
+background:var(--card);
+padding:10px;
+border-radius:12px;
+text-align:center;
+font-size:11px;
+border:1px solid #222;
+}
+.stat b{color:var(--accent)}
+
+.section{
+background:var(--card);
+border:1px solid #222;
+border-radius:15px;
+padding:15px;
+margin-top:15px;
+}
+
+.section h3{
+margin:0 0 10px;
+font-size:14px;
+color:var(--gold);
+font-family:Orbitron;
+}
+
+/* cards */
+.card{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#0c0f15;
+padding:10px;
+border-radius:12px;
+margin-bottom:8px;
+border:1px solid #1e1e1e;
+}
+.card small{color:#aaa;font-size:10px}
+.btn{
+background:var(--gold);
+border:none;
+border-radius:20px;
+padding:6px 16px;
+font-size:11px;
+font-weight:800;
+cursor:pointer;
+}
+
+/* navbar */
 nav{
-position:fixed;bottom:0;left:0;right:0;
-background:#000;border-top:1px solid #111;
-display:flex;justify-content:space-around;padding:8px 0
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:70px;
+background:#000;
+display:flex;
+justify-content:space-around;
+align-items:center;
+border-top:1px solid #222;
 }
-nav div{text-align:center;font-size:10px;color:#666;cursor:pointer}
-nav div.active{color:var(--gold)}
-nav i{font-size:18px;display:block}
-.modal{
-position:fixed;inset:0;background:rgba(0,0,0,.9);
-display:none;align-items:center;justify-content:center;z-index:99
+.nav{
+text-align:center;
+font-size:10px;
+color:#666;
 }
-.modal .box{background:#0b0f14;padding:20px;border-radius:20px;width:85%;text-align:center}
-input{
-width:100%;padding:12px;border-radius:12px;
-background:#000;color:#fff;border:1px solid #333
-}
+.nav.active{color:var(--gold)}
+.nav i{font-size:20px}
 </style>
 </head>
 
 <body>
 
-<div class="top">
-<div class="stat"><small>Tap</small><b id="pt">+1</b></div>
-<div class="stat"><small>PPH</small><b id="pph">0</b></div>
-<div class="stat"><small>Energy</small><b id="en">1000</b></div>
-</div>
+<header>
+<b>TTE PROJECT</b>
+<span id="uid" style="font-size:10px;color:#777"></span>
+</header>
 
-<!-- HOME -->
-<div class="screen active" id="home">
+<div class="container" id="screen-mine">
+
 <div class="balance">
 <h1 id="bal">0</h1>
-<small>TTE BALANCE</small>
+<p>TTE TOKENS</p>
 </div>
 
-<div class="coin-box">
 <div class="coin" onclick="tap()">TTE</div>
+
+<div class="stats">
+<div class="stat">PPH<br><b id="pph">0</b></div>
+<div class="stat">Energy<br><b id="energy">1000</b></div>
+<div class="stat">Referrals<br><b id="refs">0</b></div>
 </div>
 
-<div class="card">
-<b>AIRDROP PROGRESS</b>
-<div class="progress"><span id="airBar"></span></div>
-<small id="airTxt">0 / 10,000,000</small>
+<div class="section">
+<h3>🚀 UPGRADES</h3>
+<div id="cards"></div>
 </div>
 
-<div class="grid">
-<button class="btn btn-dark" onclick="rewardAd('turbo')">🚀 Turbo</button>
-<button class="btn btn-dark" onclick="openSpin()">🎡 Spin</button>
-<button class="btn btn-dark" onclick="rewardAd('auto')">🤖 Auto</button>
-<button class="btn btn-dark" onclick="rewardAd('daily')">🎁 Daily</button>
-</div>
+<div class="section">
+<h3>🎁 DAILY & ADS</h3>
+<button class="btn" onclick="watchAd()">WATCH AD (BOOST)</button>
+<button class="btn" onclick="spin()">SPIN</button>
 </div>
 
-<!-- UPGRADE -->
-<div class="screen" id="upgrade">
-<div class="card">
-<b>INFRASTRUCTURE</b>
-<div class="progress"><span id="upBar"></span></div>
-<small id="upTxt"></small>
-</div>
-<div class="grid" id="upGrid"></div>
+<div class="section">
+<h3>👥 REFERRAL</h3>
+<p style="font-size:11px">
+Invite friends & earn 5% of their mining
+</p>
+<div style="background:#000;padding:10px;border-radius:10px;font-size:10px" id="refLink"></div>
 </div>
 
-<!-- LEADERBOARD -->
-<div class="screen" id="leader">
-<div class="card">
-<b>🏆 LEADERBOARD (TOP 20)</b>
-<div id="leaderList"></div>
-</div>
-</div>
-
-<!-- WALLET -->
-<div class="screen" id="wallet">
-<div class="card">
-<b>TON WALLET</b>
-<input id="walletInp" placeholder="UQ...">
-<button class="btn btn-gold" style="margin-top:10px" onclick="saveWallet()">Save</button>
-</div>
-<div class="card">
-<b>SWAP</b>
-<p>10M TTE → 0.1 ELITE (future)</p>
-<button class="btn btn-dark" onclick="swap()">Swap</button>
-</div>
+<div class="section">
+<h3>👛 WALLET</h3>
+<input id="wallet" placeholder="TON Wallet Address"
+style="width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#000;color:#fff">
+<button class="btn" style="margin-top:8px" onclick="saveWallet()">SAVE</button>
 </div>
 
-<!-- ADMIN -->
-<div class="screen" id="admin">
-<div class="card">
-<b>ADMIN PANEL</b>
-<p>Global bonus</p>
-<button class="btn btn-gold" onclick="adminBonus()">+100K All</button>
-</div>
-</div>
-
-<!-- SPIN -->
-<div class="modal" id="spinModal">
-<div class="box">
-<h3>LUCKY SPIN</h3>
-<p>Max 5 / day</p>
-<button class="btn btn-gold" onclick="spin()">SPIN (Ad)</button>
-<button class="btn btn-dark" style="margin-top:10px" onclick="closeSpin()">Close</button>
-</div>
 </div>
 
 <nav>
-<div class="active" onclick="nav('home',this)">Home</div>
-<div onclick="nav('upgrade',this)">Boost</div>
-<div onclick="nav('leader',this)">Top</div>
-<div onclick="nav('wallet',this)">Wallet</div>
+<div class="nav active"><i class="fa fa-hammer"></i><br>Mine</div>
 </nav>
 
 <script>
-/* FIREBASE CONFIG */
-firebase.initializeApp({
+/* ---------- FIREBASE ---------- */
+const firebaseConfig={
 apiKey:"YOUR_API_KEY",
 databaseURL:"YOUR_DB_URL"
-});
+};
+firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
+
+/* ---------- TELEGRAM ---------- */
 const tg=window.Telegram.WebApp;
+tg.expand();
+const user=tg.initDataUnsafe.user || {id:"test"};
+const uid=user.id.toString();
+document.getElementById("uid").innerText="UID: "+uid;
 
-/* USER */
-const uid=tg.initDataUnsafe?.user?.id?.toString()||"test";
-const ADMINS=["7178946316","7852095691"];
-
-/* DATA */
+/* ---------- USER DATA ---------- */
 let u={
-bal:0,energy:1000,pph:0,
-spin:5,lastSpin:0,
-wallet:"",boost:0,auto:false,
-infra:{},elite:0
+bal:0,
+pph:0,
+energy:1000,
+ref:0,
+wallet:"",
+last:Date.now()
 };
 
-const infra=[
-{id:"n1",name:"Basic Rig",pph:50},
-{id:"n2",name:"GPU Farm",pph:200},
-{id:"n3",name:"Data Center",pph:800},
-{id:"n4",name:"AI Core",pph:3000}
+/* ---------- INIT ---------- */
+db.ref("users/"+uid).on("value",s=>{
+if(s.exists()) u={...u,...s.val()};
+else db.ref("users/"+uid).set(u);
+render();
+});
+
+/* ---------- TAP ---------- */
+function tap(){
+if(u.energy<=0) return;
+u.bal+=1;
+u.energy--;
+save();
+}
+
+/* ---------- UPGRADE CARDS ---------- */
+const cardsData=[
+{id:"c1",n:"Basic Rig",p:100,c:1000},
+{id:"c2",n:"GPU Farm",p:500,c:5000},
+{id:"c3",n:"Cloud Node",p:2000,c:20000}
 ];
 
-/* LOAD */
-db.ref("users/"+uid).on("value",s=>{
-if(!s.exists()) db.ref("users/"+uid).set(u);
-else{u=s.val();render();}
-});
-
-/* TAP */
-function tap(){
-if(u.energy<=0)return;
-let m=Date.now()<u.boost?10:1;
-u.bal+=m;u.energy--;
-save();
-}
-
-/* ADS */
-function rewardAd(t){
-show_10499994().then(()=>{
-if(t==="turbo")u.boost=Date.now()+300000;
-if(t==="daily")u.bal+=50000;
-if(t==="auto")u.auto=true;
-save();
-});
-}
-
-/* SPIN */
-function openSpin(){spinModal.style.display="flex"}
-function closeSpin(){spinModal.style.display="none"}
-function spin(){
-if(u.spin<=0)return alert("No spins");
-show_10499994().then(()=>{
-u.spin--;u.bal+=100000;save();closeSpin();
-});
-}
-
-/* UPGRADE */
-function buyInfra(id){
-show_10499994().then(()=>{
-u.infra[id]=(u.infra[id]||0)+1;
-u.pph+=infra.find(x=>x.id===id).pph;
-save();
-});
-}
-
-/* WALLET */
-function saveWallet(){
-u.wallet=walletInp.value;save();
-}
-
-/* SWAP */
-function swap(){
-if(u.bal<10000000)return alert("Need 10M");
-u.bal-=10000000;u.elite+=0.1;save();
-}
-
-/* ADMIN */
-function adminBonus(){
-if(!ADMINS.includes(uid))return;
-db.ref("users").once("value",s=>{
-s.forEach(x=>{
-x.ref.update({bal:(x.val().bal||0)+100000});
-});
-});
-}
-
-/* LEADERBOARD */
-db.ref("users").orderByChild("bal").limitToLast(20).on("value",s=>{
-leaderList.innerHTML="";
-let arr=[];
-s.forEach(x=>arr.push(x.val()));
-arr.reverse().forEach((u,i)=>{
-leaderList.innerHTML+=`<p>#${i+1} ${u.bal.toLocaleString()} TTE</p>`;
-});
-});
-
-/* RENDER */
-function render(){
-bal.innerText=Math.floor(u.bal).toLocaleString();
-en.innerText=u.energy;
-pph.innerText=u.pph;
-airBar.style.width=Math.min(100,u.bal/100000)+"%";
-airTxt.innerText=Math.floor(u.bal)+" / 10,000,000";
-upGrid.innerHTML="";
-let done=0;
-infra.forEach(i=>{
-let lvl=u.infra[i.id]||0;
-if(lvl>0)done++;
-upGrid.innerHTML+=`
-<div class="up-card">
-<small>LEVEL ${lvl}</small>
-<b>${i.name}</b>
-<span>+${i.pph}/h</span>
-<button class="btn btn-gold" onclick="buyInfra('${i.id}')">Upgrade (Ad)</button>
+function renderCards(){
+const box=document.getElementById("cards");
+box.innerHTML="";
+cardsData.forEach(c=>{
+box.innerHTML+=`
+<div class="card">
+<div>
+<b>${c.n}</b><br>
+<small>+${c.p} PPH</small>
+</div>
+<button class="btn" onclick="buy(${c.c},${c.p})">${c.c}</button>
 </div>`;
 });
-upBar.style.width=(done/infra.length*100)+"%";
-upTxt.innerText=done+" / "+infra.length+" COMPLETED";
 }
 
-/* SAVE */
-function save(){db.ref("users/"+uid).update(u)}
-
-/* NAV */
-function nav(id,e){
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-document.querySelectorAll("nav div").forEach(n=>n.classList.remove("active"));
-e.classList.add("active");
-if(id==="admin"&&!ADMINS.includes(uid))return;
+/* ---------- BUY ---------- */
+function buy(cost,pph){
+if(u.bal<cost) return alert("Not enough TTE");
+u.bal-=cost;
+u.pph+=pph;
+save();
 }
+
+/* ---------- ADS ---------- */
+function watchAd(){
+show_10499994().then(()=>{
+u.bal+=500;
+save();
+alert("Ad reward received");
+});
+}
+
+/* ---------- SPIN ---------- */
+function spin(){
+u.bal+=1000;
+save();
+alert("You won 1000 TTE");
+}
+
+/* ---------- WALLET ---------- */
+function saveWallet(){
+u.wallet=document.getElementById("wallet").value;
+save();
+alert("Wallet saved");
+}
+
+/* ---------- SAVE ---------- */
+function save(){
+db.ref("users/"+uid).update(u);
+render();
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+document.getElementById("bal").innerText=Math.floor(u.bal);
+document.getElementById("pph").innerText=u.pph;
+document.getElementById("energy").innerText=u.energy;
+document.getElementById("refs").innerText=u.ref;
+document.getElementById("refLink").innerText=
+"https://t.me/YOUR_BOT?start="+uid;
+renderCards();
+}
+
+/* ---------- PASSIVE ---------- */
+setInterval(()=>{
+u.bal+=u.pph/3600;
+if(u.energy<1000)u.energy++;
+save();
+},1000);
 </script>
+
 </body>
 </html>
