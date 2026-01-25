@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TTE Mini App</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body{margin:0;background:#05070a;color:#fff;font-family:Arial}
+.app{max-width:430px;margin:auto;padding:12px}
+.card{background:#0d1117;border-radius:16px;padding:12px;margin-bottom:10px}
+.btn{width:100%;padding:10px;border:none;border-radius:12px;font-weight:700}
+.ad{background:#ffcc00;color:#000}
+.dark{background:#161b22;color:#ffcc00;border:1px solid #333}
+h2{text-align:center;color:#ffcc00}
+.small{font-size:12px;opacity:.7}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<h2>🚀 TTE MINI APP</h2>
+<div class="card">
+<b>Balance:</b> <span id="bal">0</span> TTE<br>
+<span class="small">UID: <span id="uid"></span></span>
+</div>
+
+<div class="card">
+<b>⛏ Auto Mine</b>
+<button class="btn ad" onclick="ad('mine')">Watch Ad</button>
+</div>
+
+<div class="card">
+<b>🎁 Daily Reward</b>
+<button class="btn ad" onclick="ad('daily')">Claim</button>
+</div>
+
+<div class="card">
+<b>🎡 Spin (Max 5/day)</b>
+<button class="btn ad" onclick="ad('spin')">Spin</button>
+</div>
+
+<h2>⚙ Cards</h2>
+<div id="cards" class="grid"></div>
+
+<h2>👥 Referral</h2>
+<div class="card">
+<code id="ref"></code>
+</div>
+
+<h2>🛠 Admin</h2>
+<div id="admin" class="card hidden">
+<button class="btn dark" onclick="resetSpin()">Reset Spins</button>
+<button class="btn dark" onclick="addAll()">Add 10k to All</button>
+</div>
+
+</div>
+
+<script>
+// ================= TELEGRAM =================
+const tg=window.Telegram.WebApp;tg.expand();
+const TGID=tg.initDataUnsafe?.user?.id||0;
+
+// ================= FIREBASE =================
+firebase.initializeApp({
+ apiKey:"AIzaSyFAKE",
+ authDomain:"tte.firebaseapp.com",
+ databaseURL:"https://tte-default-rtdb.firebaseio.com",
+ projectId:"tte",
+ appId:"1:web"
+});
+const db=firebase.database();
+firebase.auth().signInAnonymously();
+
+// ================= ADMIN =================
+const ADMINS=["7178946316","7852095691"];
+
+// ================= USER =================
+let UID,USER;
+firebase.auth().onAuthStateChanged(u=>{
+ if(!u)return;
+ UID=u.uid;
+ document.getElementById("uid").innerText=UID.slice(0,6);
+ db.ref("users/"+UID).once("value",s=>{
+  if(!s.exists()){
+   db.ref("users/"+UID).set({
+    tg:TGID,bal:0,spin:0,last:0,cards:{},ref:0
+   });
+  }
+ });
+ db.ref("users/"+UID).on("value",s=>{
+  USER=s.val();
+  document.getElementById("bal").innerText=USER.bal||0;
+  renderCards();
+  if(ADMINS.includes(String(USER.tg)))
+    document.getElementById("admin").classList.remove("hidden");
+ });
+ document.getElementById("ref").innerText=
+ "https://t.me/YOURBOT?start="+UID;
+});
+
+// ================= ADS =================
+function ad(type){
+ // Monetag interstitial এখানে বসাবে
+ setTimeout(()=>reward(type),800);
+}
+
+function reward(t){
+ let now=Date.now();
+ if(t=="daily"){
+  if(now-(USER.last||0)<86400000)return alert("Already claimed");
+  update({bal:USER.bal+500,last:now});
+ }
+ if(t=="spin"){
+  if((USER.spin||0)>=5)return alert("Spin limit");
+  update({bal:USER.bal+Math.floor(Math.random()*1000),spin:(USER.spin||0)+1});
+ }
+ if(t=="mine"){
+  update({bal:USER.bal+200});
+ }
+}
+
+// ================= UPDATE =================
+function update(d){db.ref("users/"+UID).update(d);}
+
+// ================= CARDS =================
+const CARDS=[
+{id:"c1",n:"Basic Rig",p:100,c:1000},
+{id:"c2",n:"GPU Farm",p:500,c:5000},
+{id:"c3",n:"ASIC",p:2000,c:20000},
+{id:"c4",n:"AI Core",p:8000,c:80000}
+];
+
+function renderCards(){
+ let h="";
+ CARDS.forEach(c=>{
+  let l=USER.cards?.[c.id]||0;
+  let cost=c.c*(l+1);
+  h+=`<div class="card">
+  <b>${c.n}</b>
+  <div class="small">Lv ${l} | +${c.p}/h</div>
+  <button class="btn dark" onclick="buy('${c.id}',${cost})">
+   Upgrade ${cost}
+  </button></div>`;
+ });
+ document.getElementById("cards").innerHTML=h;
+}
+
+function buy(id,c){
+ if(USER.bal<c)return alert("Low balance");
+ let cards=USER.cards||{};
+ cards[id]=(cards[id]||0)+1;
+ update({bal:USER.bal-c,cards});
+}
+
+// ================= ADMIN ACTION =================
+function resetSpin(){
+ db.ref("users").once("value",s=>{
+  s.forEach(u=>u.ref.update({spin:0}));
+ });
+}
+function addAll(){
+ db.ref("users").once("value",s=>{
+  s.forEach(u=>u.ref.update({bal:(u.val().bal||0)+10000}));
+ });
+}
+</script>
+</body>
+</html>
