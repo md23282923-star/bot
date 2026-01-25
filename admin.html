@@ -1,43 +1,201 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ELITE ADMIN</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <style>
-        body { background: #000; color: #ffcc00; font-family: sans-serif; padding: 30px; }
-        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
-        h1 { border-bottom: 2px solid #ffcc00; padding-bottom: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TTE ADMIN PANEL</title>
+
+<!-- Telegram -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+body{
+margin:0;
+font-family:Poppins,Arial;
+background:#05070d;
+color:#fff;
+}
+header{
+background:#000;
+padding:15px;
+text-align:center;
+border-bottom:1px solid #222;
+}
+header b{
+color:#f3c623;
+font-size:18px;
+}
+
+.container{
+padding:15px;
+}
+
+.box{
+background:#12151c;
+border:1px solid #222;
+border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+}
+
+.box h3{
+margin:0 0 10px;
+color:#f3c623;
+font-size:14px;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-bottom:8px;
+border-radius:10px;
+border:1px solid #333;
+background:#000;
+color:#fff;
+}
+
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:20px;
+background:#f3c623;
+font-weight:900;
+cursor:pointer;
+}
+
+.userRow{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#0c0f15;
+padding:10px;
+border-radius:10px;
+margin-bottom:6px;
+font-size:11px;
+}
+.userRow b{color:#00d2ff}
+</style>
 </head>
+
 <body>
-    <h1>ELITE Master Control</h1>
-    <div class="card">
-        <h3>Live Stats</h3>
-        <p id="total-m">Total Miners: Loading...</p>
-        <p id="total-c">Total TTE Mined: Loading...</p>
-    </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAn1mn3IZ6eReChizrKIZvCBt4zkOn_svU",
-            authDomain: "tte-game.firebaseapp.com",
-            databaseURL: "https://tte-game-default-rtdb.firebaseio.com",
-            projectId: "tte-game",
-            storageBucket: "tte-game.firebasestorage.app",
-            messagingSenderId: "1067385955645",
-            appId: "1:1067385955645:web:09b237ceaf180459311154"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<header>
+<b>🔐 TTE ADMIN PANEL</b>
+<div id="uid" style="font-size:10px;color:#777"></div>
+</header>
 
-        db.ref('users').on('value', (snap) => {
-            const data = snap.val();
-            let count = 0, coins = 0;
-            for(let i in data) { count++; coins += data[i].balance || 0; }
-            document.getElementById('total-m').innerText = "Total Miners: " + count;
-            document.getElementById('total-c').innerText = "Total TTE Mined: " + Math.floor(coins).toLocaleString();
-        });
-    </script>
+<div class="container" id="adminArea" style="display:none">
+
+<div class="box">
+<h3>👤 USER CONTROL</h3>
+<input id="uId" placeholder="User UID">
+<input id="uBal" placeholder="Set Balance">
+<input id="uPph" placeholder="Set PPH">
+<button onclick="updateUser()">UPDATE USER</button>
+</div>
+
+<div class="box">
+<h3>🚫 BAN / UNBAN</h3>
+<input id="banId" placeholder="User UID">
+<select id="banState">
+<option value="true">BAN</option>
+<option value="false">UNBAN</option>
+</select>
+<button onclick="banUser()">APPLY</button>
+</div>
+
+<div class="box">
+<h3>⚙️ GLOBAL SETTINGS</h3>
+<input id="dailyCap" placeholder="Daily Earning Cap">
+<button onclick="setCap()">SAVE</button>
+</div>
+
+<div class="box">
+<h3>📋 USERS (LIVE)</h3>
+<div id="users"></div>
+</div>
+
+</div>
+
+<script>
+/* -------- CONFIG -------- */
+const ADMIN_IDS=["7178946316","7852095691"];
+
+const firebaseConfig={
+apiKey:"YOUR_API_KEY",
+databaseURL:"YOUR_DB_URL"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+/* -------- TELEGRAM -------- */
+const tg=window.Telegram.WebApp;
+tg.expand();
+const uid=tg.initDataUnsafe.user?.id.toString() || "test";
+document.getElementById("uid").innerText="UID: "+uid;
+
+/* -------- AUTH -------- */
+if(!ADMIN_IDS.includes(uid)){
+document.body.innerHTML="<h2 style='text-align:center;margin-top:50px'>ACCESS DENIED</h2>";
+}else{
+document.getElementById("adminArea").style.display="block";
+}
+
+/* -------- USER UPDATE -------- */
+function updateUser(){
+const id=document.getElementById("uId").value;
+const bal=parseFloat(document.getElementById("uBal").value);
+const pph=parseFloat(document.getElementById("uPph").value);
+
+if(!id) return alert("UID required");
+
+const data={};
+if(!isNaN(bal)) data.bal=bal;
+if(!isNaN(pph)) data.pph=pph;
+
+db.ref("users/"+id).update(data);
+alert("User updated");
+}
+
+/* -------- BAN -------- */
+function banUser(){
+const id=document.getElementById("banId").value;
+const state=document.getElementById("banState").value==="true";
+db.ref("users/"+id+"/banned").set(state);
+alert(state?"User banned":"User unbanned");
+}
+
+/* -------- GLOBAL -------- */
+function setCap(){
+const cap=parseFloat(document.getElementById("dailyCap").value);
+db.ref("config/dailyCap").set(cap);
+alert("Daily cap updated");
+}
+
+/* -------- LIVE USERS -------- */
+db.ref("users").limitToLast(20).on("value",s=>{
+const box=document.getElementById("users");
+box.innerHTML="";
+if(!s.exists()) return;
+Object.entries(s.val()).forEach(([id,u])=>{
+box.innerHTML+=`
+<div class="userRow">
+<div>
+<b>${id}</b><br>
+${Math.floor(u.bal||0)} TTE
+</div>
+${u.banned?"🚫":"✅"}
+</div>`;
+});
+});
+</script>
+
 </body>
 </html>
